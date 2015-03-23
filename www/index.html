@@ -105,7 +105,7 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}};
         
         data.entrance=entrance;
         data.entrance.events.push("testE1");
@@ -117,12 +117,35 @@
         
         var functions={test:testf}
         
+        function getEvents(events){
+            var usable=[];
+            var event;
+            for(var key in events){
+                event=data[events[key]];
+                if(eventUsable(event))
+                    usable.push(event.event);
+            }
+            return usable;
+        }
+        
+        function explore(area){
+            addToDisplay(area);
+            var usable=getEvents(data[area].events);
+            var indx=getRandom(0,usable.length-1);
+            usable[indx]();
+        }
+        
+        function eventUsable(event){
+            return event.unresolved.value;
+        }
+        
         function testEvent1(){
             addToDisplay("While exploring something happened that invloved you getting raped");
         }
         
         function testEvent2(){
             addToDisplay("While exploring something happened that invloved you getting raped twice");
+            nowIs("testE2", "resolved");
         }
         
         function defualtAppearance(){
@@ -495,7 +518,7 @@
         }
         
         function exploreRaped(){
-            addToDisplay("Yay you found something and got raped");   
+            explore(data.currentLocation.value);
         }
         
         function scavengeRaped(){
