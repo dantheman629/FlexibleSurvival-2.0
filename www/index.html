@@ -78,6 +78,7 @@
         var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[]};
         
         var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[]};
+        var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', things:[], events:[], monsters:[]};
         
         var otherwiseStates=[];
         
@@ -94,20 +95,12 @@
         var doSomething={type:"action", name:"action", action:doFSAction};
         entrance.things.something=doSomething;
         
-        var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
-        var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
-        aThing.actions.fuck=fuck;
-        var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
-        aThing.actions.talk=talk;
-        addThing("entrance", "thing", aThing);
-        
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox"}, huskyBitch:{type:"monster", name:"husky bitch"}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox"}, huskyBitch:{type:"monster", name:"husky bitch"}, navLocs:["entrance", ]};
         
-        var data="test";
         
-        /*data.entrance=entrance;
+        data.entrance=entrance;
         data.north=north;
         data.northwest=northwest;
         data.northeast=northeast;
@@ -115,11 +108,18 @@
         data.east=east;
         data.south=south;
         data.southwest=southwest;
-        data.southeast=southeast;*/
+        data.southeast=southeast;
         data.entrance.events.push("testE1");
         data.entrance.events.push("testE2");
         data.entrance.monsters.push("latexFox");
         data.entrance.monsters.push("huskyBitch");
+        
+        var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
+        var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
+        aThing.actions.fuck=fuck;
+        var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
+        aThing.actions.talk=talk;
+        addThing("entrance", "thing", aThing);
         
         var definitions={submissive:isSubmissive};
         
@@ -347,8 +347,7 @@
         }
         
         function addThing(loc, name, thing){
-            locations[loc].things[name]=thing;
-            things[name]=thing;
+            data[loc].things[name]=thing;
         }
         
         function doFSAction(){
@@ -385,13 +384,11 @@
         }
         
         function describeLocation(locName){
-            addToDisplayNoLine("<b>"+locations[locName].name+"</b>");
-            addToDisplay(locations[locName].description);
+            addToDisplayNoLine("<b>"+data[locName].name+"</b>");
+            addToDisplay(data[locName].description);
         }
         
         function describeCurrentLocation(){
-            addToDisplay("describe");
-            addToDisplay(data);
             addToDisplay(data.currentLocation.value);
             addToDisplayNoLine("<b>"+data[data.currentLocation.value].name+":</b>");
             addToDisplay(data[data.currentLocation.value].description);
@@ -402,49 +399,50 @@
         }
         
         function goSouth(){
-            setLocation(currentLocation.south);
+            setLocation(data[data.currentLocation.value].south);
         }
         function goEast(){
-            setLocation(currentLocation.east);
+            setLocation(data[data.currentLocation.value].east);
         }
         
         function goWest(){
-            setLocation(currentLocation.west);
+            setLocation(data[data.currentLocation.value].west);
         }
         
         function goNorthEast(){
-            setLocation(currentLocation.northeast);
+            setLocation(data[data.currentLocation.value].northeast);
         }
         
         function goSouthEast(){
-            setLocation(currentLocation.southeast);
+            setLocation(data[data.currentLocation.value].southeast);
         }
         function goNorthWest(){
-            setLocation(currentLocation.northwest);
+            setLocation(data[data.currentLocation.value].northwest);
         }
         
         function goSouthWest(){
-            setLocation(currentLocation.southwest);
+            setLocation(data[data.currentLocation.value].southwest);
         }
         
         function setLocation(locName){
-            currentLocation=locations[locName];
+            data.currentLocation.value=locName;
             setButtonsTravel();
             describeCurrentLocation();
         }
         
         function setButtonsTravel(){
+            var curLoc=data[data.currentLocation.value];
             disableAllButtons();
             var b1=document.getElementById("b1");
-            if('northwest' in currentLocation){
+            if('northwest' in curLoc){
                 enableButton(b1, "northwest", goNorthWest);
             }
             var b2=document.getElementById("b2");
-            if('north' in currentLocation){
+            if('north' in curLoc){
                 enableButton(b2, "north", goNorth);
             }
             var b3=document.getElementById("b3");
-            if('northeast' in currentLocation){
+            if('northeast' in curLoc){
                 enableButton(b3, "northeast", goNorthEast);
             }
             
@@ -453,14 +451,14 @@
             enableButton(document.getElementById("b5"), "smut", displaySmut);
             
             var b6=document.getElementById("b6");
-            if('west' in currentLocation){
+            if('west' in curLoc){
                 enableButton(b6, "west", goWest);
             }
             
             enableButton(document.getElementById("b7"), "current", describeCurrentLocation);
             
             var b8=document.getElementById("b8");
-            if('east' in currentLocation){
+            if('east' in curLoc){
                 enableButton(b8, "east", goEast);
             }
             
@@ -469,20 +467,20 @@
             enableButton(document.getElementById("b10"), "debug", debugTest);
             
             var b11=document.getElementById("b11");
-            if('southwest' in currentLocation){
+            if('southwest' in curLoc){
                 enableButton(b11, "southwest", goSouthWest);
             }
             var b12=document.getElementById("b12");
-            if('south' in currentLocation){
+            if('south' in curLoc){
                 enableButton(b12, "south", goSouth);
             }
             var b13=document.getElementById("b13");
-            if('southeast' in currentLocation){
+            if('southeast' in curLoc){
                 enableButton(b13, "southeast", goSouthEast);
             }
             
             var b14=document.getElementById("b14");
-            if('navable' in currentLocation){
+            if('navable' in curLoc && curLoc.navable){
                 enableButton(b14, "navigate", navRaped);
             }
             
@@ -491,24 +489,24 @@
         
         function setButtonsActions(){
             disableAllButtons();
-            
+            var curLoc=data[data.currentLocation.value];
             var b1=document.getElementById("b1");
-            if('huntable' in currentLocation){
+            if('huntable' in curLoc){
                 enableButton(b1, "hunt", huntRaped);
             }
             
             var b2=document.getElementById("b2");
-            if('explorable' in currentLocation){
+            if('explorable' in curLoc){
                 enableButton(b2, "explore", exploreRaped);
             }
             
             var b3=document.getElementById("b3");
-            if('scavengable' in currentLocation){
+            if('scavengable' in curLoc){
                 enableButton(b3, "scavenge", scavengeRaped);
             }
             
             var i=0;
-            var things=currentLocation.things;
+            var things=curLoc.things;
             var thing;
             for(var key in things){
                 thing=things[key];
@@ -547,7 +545,6 @@
         }
         
         function debugTest(){
-            addToDisplay(data);
             nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
             var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
