@@ -133,17 +133,20 @@
         function nowIs(name, value){
             var obj=findObject(name);
             if(obj.type == "text" || obj.type == "number"){
-                addToDisplay("simple");
                 obj.value=value;
             }
             else{
-                addToDisplay("complex");
                 obj[value].value=true;
                 var others=obj[value].others;
                 for(var key in others){
                     obj[others[key]]=false;
                 }
             }
+        }
+        
+        function nowIsNot(name, value){
+            var obj=findObject(name);
+            obj[value].value=false;
         }
         
         function isSubmissive(name){
