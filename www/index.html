@@ -61,24 +61,24 @@
         var curdisplay="INITIAL<br />";
         var buttonNames=["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11", "b12", "b13", "b14", "b15"]
         
-        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[], monsters:[]};
+        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[], monsters:[], known:{type:"option", value:true, others:[]}};
         
-        var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[], events:[], monsters:[]};
+        var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
         var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[], events:[], monsters:[]};
         
-        var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[], events:[], monsters:[]};
+        var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
-        var northeast={type:"location", name:'northeast', description:'whole lotta nothing but in the northeast', south:"east", southwest:"entrance", west:"north", things:[], events:[], monsters:[]};
+        var northeast={type:"location", name:'northeast', description:'whole lotta nothing but in the northeast', south:"east", southwest:"entrance", west:"north", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
-        var north={type:"location", name:'north', description:'whole lotta nothing but in the north. should be able to nav', navable:true, west:"northwest", southwest:"west", south:"entrance", southeast:"east", east:"northeast", things:[], events:[], monsters:[]};
+        var north={type:"location", name:'north', description:'whole lotta nothing but in the north. should be able to nav', navable:true, west:"northwest", southwest:"west", south:"entrance", southeast:"east", east:"northeast", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
-        var northwest={type:"location", name:'northwest', description:'whole lotta nothing but in the northwest', south:"west", southeast:"entrance", east:"north", things:[], events:[], monsters:[]};
+        var northwest={type:"location", name:'northwest', description:'whole lotta nothing but in the northwest', south:"west", southeast:"entrance", east:"north", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
-        var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[]};
+        var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
-        var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[]};
-        var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', navable:true, things:[], events:[], monsters:[]};
+        var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
+        var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', navable:true, things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
         
         var otherwiseStates=[];
         
@@ -116,6 +116,8 @@
         data.entrance.monsters.push("huskyBitch");
         data.mall.monsters.push("latexFox");
         data.mall.monsters.push("huskyBitch");
+        data.north.monsters.push("latexFox");
+        data.north.monsters.push("huskyBitch");
         
         var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
         var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
@@ -152,15 +154,15 @@
         }
         
         function startNav(area){
-            addToDisplay(area);
             addToDisplay("You start travelling to "+area+".");
             if(Math.random()<data.fightChance.value){
                 var usable=getMonsters(data[data.currentLocation.value].monsters);
                 var indx=getRandom(0,usable.length-1);
                 fightMonster(usable[indx], function (){finishNav(area)});
             }
-            else
+            else{
                 finishNav(area);
+            }
         }
         
         function finishNav(area){
@@ -252,8 +254,9 @@
         }
         
         function testEvent2(){
-            addToDisplay("While exploring something happened that invloved you getting raped twice");
+            addToDisplay("While exploring something happened that invloved you getting raped twice.  Oh and you found the mall on your way back");
             nowIs("testE2", "resolved");
+            nowIs("mall", "known");
         }
         
         function defualtAppearance(){
@@ -469,32 +472,40 @@
         }
         
         function goNorth(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].north);
         }
         
         function goSouth(){
+            nowIs(data[data.currentLocation.value].south, "known");
             setLocation(data[data.currentLocation.value].south);
         }
         function goEast(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].east);
         }
         
         function goWest(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].west);
         }
         
         function goNorthEast(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].northeast);
         }
         
         function goSouthEast(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].southeast);
         }
         function goNorthWest(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].northwest);
         }
         
         function goSouthWest(){
+            nowIs(data[data.currentLocation.value].north, "known");
             setLocation(data[data.currentLocation.value].southwest);
         }
         
@@ -582,12 +593,21 @@
             disableAllButtons();
             var test;
             var i;
+            var j=0;
             for(i=0; i<data.navLocs.length;i++){
-                enableButton(document.getElementById(buttonNames[i]), data.navLocs[i], function(){startNav(this.innerHTML);});
+                if(data[data.navLocs[i]].known.value){
+                    enableButton(document.getElementById(buttonNames[j]), data.navLocs[i], function(){startNav(this.innerHTML);});
+                    j++;
+                }
             }
         }
         
         function combatTurn(action){
+            if(action == "flee"){
+                addToDisplay("You run away");
+                setButtonsSingle("continue", data.combatState.afterCombat);
+                return;
+            }
             if(action == "submit"){
                 data.combatState.monster.submitScene();
                 setButtonsSingle("continue", data.combatState.afterCombat);
