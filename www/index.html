@@ -596,7 +596,8 @@
             var j=0;
             for(i=0; i<data.navLocs.length;i++){
                 if(data[data.navLocs[i]].known.value){
-                    enableButton(document.getElementById(buttonNames[j]), data.navLocs[i], function(){startNav(this.innerHTML);});
+                    enableButton(document.getElementById(buttonNames[j]), data[data.navLocs[i]].name, function(){startNav(this.getAttribute("data-loc"));});
+                    document.getElementById(buttonNames[j]).setAttribute("data-loc",data.navLocs[i]);
                     j++;
                 }
             }
