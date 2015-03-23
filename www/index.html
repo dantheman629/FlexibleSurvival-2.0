@@ -61,7 +61,7 @@
         var curdisplay="INITIAL<br />";
         var buttonNames=["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11", "b12", "b13", "b14", "b15"]
         
-        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast"};
+        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[]};
         
         var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[]};
         
@@ -105,7 +105,11 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:true}, testOp2:{type:"option", value:false}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}};
+        
+        data.entrance=entrance;
+        data.entrance.events.push("testE1");
+        data.entrance.events.push("testE2");
         
         var definitions={submissive:isSubmissive};
         
@@ -113,9 +117,33 @@
         
         var functions={test:testf}
         
+        function testEvent1(){
+            addToDisplay("While exploring something happened that invloved you getting raped");
+        }
+        
+        function testEvent2(){
+            addToDisplay("While exploring something happened that invloved you getting raped twice");
+        }
+        
         function defualtAppearance(){
             var app={head:"human", torso:"human",  legs:"human", skin:"human", height:72, weight:3, breasts:{number:1, main:0, extras:[]}, vaginas:{number:0, main:0, extras:[]}, dicks:{number:0, main:0, extras:[]}}
             return app;
+        }
+        
+        function nowIs(name, value){
+            var obj=findObject(name);
+            if(obj.type == "text" || obj.type == "number"){
+                addToDisplay("simple");
+                obj.value=value;
+            }
+            else{
+                addToDisplay("complex");
+                obj[value].value=true;
+                var others=obj[value].others;
+                for(var key in others){
+                    obj[others[key]]=false;
+                }
+            }
         }
         
         function isSubmissive(name){
@@ -170,12 +198,10 @@
             time.minute=time.minute*-1;
             addRemaining(time);
             
-            addToDisplay("updating");
             updateHealth();
             updateTime();
             updateTurns();
             updateRemaining();
-            addToDisplay("done");
         }
         
         function displayTime(){
@@ -420,7 +446,6 @@
             for(var key in things){
                 thing=things[key];
                 if(thing.type == "action"){
-                    thing.action();
                     enableButton(document.getElementById(buttonNames[5+i]), thing.name, thing.action);
                 }
                 else if(thing.type == "thing"){
@@ -455,12 +480,10 @@
         }
         
         function debugTest(){
-            addToDisplay("nonsense "+data["nonsense"]);
+            nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
-            var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2] FUCK YAY.[end if][end if][end if][end if]");
-            addToDisplay("PARSED");
+            var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
             var output=evaluateStatement(statement.inside,0);
-            addToDisplay("EVALED");
             addToDisplay(output);
         }
         
@@ -645,9 +668,7 @@
         }
         
         function getValue(input){
-            addToDisplay("value :"+input);
             if(!isNaN(input)){
-                addToDisplay("number");
                 return input;
             }
             if(/"/.test(input)){
@@ -660,12 +681,9 @@
             var lookups=input.split(/ of /);
             var i;
             var found=data;
-            addToDisplay("l l "+lookups.length);
             for(i=lookups.length-1; i>=0; i--){
                 found=found[lookups[i].trim()];
-                addToDisplay("type "+found.type);
             }
-            addToDisplay(found.value);
             return found.value;
         }
         
@@ -694,18 +712,13 @@
         }
         
         function is(strings){
-            addToDisplay("is thing");
             strings[0]=strings[0].trim();
             strings[1]=strings[1].trim();
-            addToDisplay("obj");
             var obj=findObject(strings[0]);
-            addToDisplay("define");
             if(strings[1] in definitions)
                 return definitions[strings[1]](strings[0]);
-            addToDisplay("undefine");
-            if(obj == 'undefined' || obj.type != "thing")
+            if(obj.type == "text" || obj.type == "number" || obj.type =="option")
                 return getValue(strings[0]) == getValue(strings[1]);
-            addToDisplay("thingy");
             return obj[strings[1]].value == true;
         }
         
