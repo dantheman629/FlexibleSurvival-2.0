@@ -82,7 +82,7 @@
         
         var otherwiseStates=[];
         
-        var player={maxHp:100, hp:100};
+        var player={maxHp:100, hp:100, attack:10};
         
         var things={};
         
@@ -97,7 +97,7 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox"}, huskyBitch:{type:"monster", name:"husky bitch"}, navLocs:["entrance", ]};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.")}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox")}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.")}, maxHp:50, attack:10}, huskyBitch:{type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.")}, submitScene:function (){addToDisplay("You submit and get fucked by a husky")}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.")}, maxHp:100, attack:5}, navLocs:["entrance"], combatState:{name:"latexFox", maxHp:0, hp:0}};
         
         
         data.entrance=entrance;
@@ -127,6 +127,35 @@
         
         var functions={test:testf}
         
+        function setCombat(monster, afterCombat){
+            data.combatState.monster=monster;
+            monster.description();
+            data.combatState.afterCombat=afterCombat;
+            data.combatState.maxHp=monster.maxHp;
+            data.combatState.hp=monster.maxHp;
+            setButtonsSingle("FIGHT!", startCombat);
+        }
+        
+        function testSubmit(){
+            addToDisplay("you submit and get fucked.");
+        }
+        
+        function testDefeat(){
+            addToDisplay("you get beat up and get fucked.");
+        }
+        
+        function victory(){
+            addToDisplay("you win and fuck the monster.");
+        }
+        
+        function startCombat(){
+            clearDisplay();
+            setButtonsCombat();
+            document.getElementById("display").innerHTML="<div id=\"combatPlayer\">PLAYER</div><div id=\"combatEnemy\">ENEMY</div>";
+            updateEnemyCombat();
+            updatePlayerCombat();
+        }
+        
         function getEvents(events){
             var usable=[];
             var event;
@@ -151,6 +180,20 @@
         
         function fightMonster(monster){
             addToDisplay("You fought a "+monster.name+" and lost.  Then suprise you got raped.");
+        }
+        
+        function updatePlayerCombat(){
+            var disp="";
+            disp+="Player:<br />";
+            disp+=displayHealth();
+            document.getElementById("combatPlayer").innerHTML=disp;
+        }
+        
+        function updateEnemyCombat(){
+            var disp="";
+            disp+="Enemy:<br />";
+            disp+=displayEnemyHealth();
+            document.getElementById("combatEnemy").innerHTML=disp;
         }
         
         function explore(area){
@@ -364,6 +407,10 @@
             return "Health: "+data.player.hp+"/"+data.player.maxHp;
         }
         
+        function displayEnemyHealth(){
+            return "Health: "+data.combatState.hp+"/"+data.combatState.maxHp;
+        }
+        
         function addToDisplayNoLine(text){
             var display = document.getElementById("display");
             curdisplay=curdisplay+text+"<br />"; 
@@ -487,6 +534,72 @@
             enableButton(document.getElementById("b15"), "actions", setButtonsActions);
         }
         
+        function setButtonsSingle(name, action){
+            disableAllButtons();
+            enableButton(document.getElementById("b1"), name, action);
+        }
+        
+        function setButtonsCombat(){
+            disableAllButtons();
+            
+            enableButton(document.getElementById("b1"), "attack", function(){combatTurn("attack")});
+            
+            enableButton(document.getElementById("b2"), "wait", function(){combatTurn("wait")});
+            
+            enableButton(document.getElementById("b3"), "submit", function(){combatTurn("submit")});
+            
+            enableButton(document.getElementById("b4"), "flee", function(){combatTurn("flee")});
+        }
+        
+        function combatTurn(action){
+            if(action == "submit"){
+                data.combatState.monster.submitScene();
+                setButtonsSingle("continue", data.combatState.afterCombat);
+                return;
+            }
+            if(action == "attack")
+                playerAttack();
+            updateEnemyCombat();
+            if(data.combatState.hp<=0){
+                data.combatState.monster.victoryScene();
+                setButtonsSingle("continue", data.combatState.afterCombat);
+                return;
+            }
+            monsterAttack();
+            updatePlayerCombat();
+            updateHealth();
+            if(data.player.hp<=0){
+                data.combatState.monster.defeatSceneScene();
+                setButtonsSingle("continue", data.combatState.afterCombat);
+                return;
+            }
+        }
+        
+        function playerAttack(){
+            data.combatState.hp-=data.player.attack;
+        }
+        
+        function monsterAttack(){
+            data.player.hp-=data.combatState.monster.attack;
+        }
+        
+        function attack(){
+            addToDisplay("you attacked the enemy");
+        }
+        
+        function wait(){
+            addToDisplay("you waited...for some reason");
+        }
+        
+        function submit(){
+            addToDisplay("you submited you horny fuck");
+        }
+        
+        function flee(){
+            addToDisplay("you ran away, coward");
+        }
+        
+        
         function setButtonsActions(){
             disableAllButtons();
             var curLoc=data[data.currentLocation.value];
@@ -545,11 +658,12 @@
         }
         
         function debugTest(){
-            nowIs("simple", "testOp");
+            setCombat(data["huskyBitch"], setButtonsTravel);
+            /*nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
             var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
             var output=evaluateStatement(statement.inside,0);
-            addToDisplay(output);
+            addToDisplay(output);*/
         }
         
         function navRaped(){
@@ -1073,6 +1187,28 @@
             margin:5px;
             border: 3px solid black;
             align-content: center;
+        }
+        
+        #combatPlayer{
+            background-color: white;
+            width:200px;
+            height:100px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            border: 1px solid black;
+            float:left;
+        }
+        
+        #combatEnemy{
+            background-color: white;
+            width:200px;
+            height:100px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            border: 1px solid black;
+            float:right;
         }
         
         button {
