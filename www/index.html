@@ -105,9 +105,9 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}/*, single:{type:"option", value:false, others:[]}, option1:{type:"option", value:true, others:["option2"]}, option2:{type:"option", value false, others:["option1"]}*/}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:true}, testOp2:{type:"option", value:false}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}};
         
-       // var definitions={submissive};
+        var definitions={submissive:isSubmissive};
         
         data.player=player;
         
@@ -119,7 +119,7 @@
         }
         
         function isSubmissive(name){
-            return data[name].value == "submissive";
+            return name == "submissive";
         }
         
         
@@ -455,7 +455,13 @@
         }
         
         function debugTest(){
+            addToDisplay("nonsense "+data["nonsense"]);
             finishTurn({day:0, hour:4, minute:30});
+            var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2] FUCK YAY.[end if][end if][end if][end if]");
+            addToDisplay("PARSED");
+            var output=evaluateStatement(statement.inside,0);
+            addToDisplay("EVALED");
+            addToDisplay(output);
         }
         
         function navRaped(){
@@ -688,15 +694,33 @@
         }
         
         function is(strings){
+            addToDisplay("is thing");
             strings[0]=strings[0].trim();
             strings[1]=strings[1].trim();
-            return getValue(strings[0]) == getValue(strings[1]);
+            addToDisplay("obj");
+            var obj=findObject(strings[0]);
+            addToDisplay("define");
+            if(strings[1] in definitions)
+                return definitions[strings[1]](strings[0]);
+            addToDisplay("undefine");
+            if(obj == 'undefined' || obj.type != "thing")
+                return getValue(strings[0]) == getValue(strings[1]);
+            addToDisplay("thingy");
+            return obj[strings[1]].value == true;
         }
         
         function isNot(strings){
-            strings[0]=strings[0].trim();
-            strings[1]=strings[1].trim();
-            return getValue(strings[0]) != getValue(strings[1]);
+            return !is(strings);
+        }
+        
+        function findObject(input){
+            var lookups=input.split(/ of /);
+            var i;
+            var found=data;
+            for(i=lookups.length-1; i>=0; i--){
+                found=found[lookups[i].trim()];
+            }
+            return found
         }
         
         function evaluateBoolean(statement){
