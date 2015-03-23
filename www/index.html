@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html>
+<!--
+  * Copyright © 2012-2015, Intel Corporation. All rights reserved.
+  * Please see the included LICENSE.md file for license terms and conditions.
+  -->
+<head>
+    <title>Blank Standard HTML5 Web App Template</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+<!-- This is a blank template, include any desired javascript frameworks, libraries, CSS here and start developing your app  -->
+<!--
+  * The "meta viewport" tag (below) helps your app size appropriately to a device's ideal viewport.
+  * Note that Windows device viewports work better when initialized using the @viewport CSS rule.
+  * For a quick overview of "meta viewport" and @viewport, see this article:
+  *   http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag
+  * To see how it works, try your app on a real device with and without a "meta viewport" tag.
+  * Additional useful references include:
+  *   http://www.quirksmode.org/mobile/viewports.html
+  *   http://www.quirksmode.org/mobile/metaviewport/devices.html
+  *   https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html
+-->
+
+    <!-- <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"> -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
+
+    <style>
+    /* following three (cascaded) are equivalent to above three meta viewport statements */
+    /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html */
+    /* see http://dev.w3.org/csswg/css-device-adapt/ */
+        @-ms-viewport { width: 100vw ; min-zoom: 100% ; zoom: 100% ; }          @viewport { width: 100vw ; min-zoom: 100% zoom: 100% ; }
+        @-ms-viewport { user-zoom: fixed ; min-zoom: 100% ; }                   @viewport { user-zoom: fixed ; min-zoom: 100% ; }
+        /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
+    </style>
+
+<!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+<!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+
+<!--
+  * cordova.js is a phantom lib for "Cordova HTML5 web app," it does nothing in a "Standard HTML5 web app"
+  * Seeing a "Failed to load resource: net::ERR_FILE_NOT_FOUND" message caused by this "cordova.js" script?
+  * The cordova.js script is required if you convert your "Standard HTML5" project into a "Cordova" project.
+  * You can safely ignore the error or comment out this line if you will not be developing a Cordova app.
+-->
+
+<!-- Recommended location for your JavaScript libraries -->
+<!-- These library references (below) are just examples to give you the general idea... -->
+    <!-- <script src="lib/mc/hammer.js"></script> -->
+    <!-- <script src="lib/ft/fastclick.js"></script> -->
+    <!-- <script src="lib/jq/jquery.js"></script> -->
+    <!-- <script src="js/my-app.js"></script> -->
+
+
+
+<!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+<!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+    <script>
+        var curdisplay="INITIAL<br />";
+        var buttonNames=["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11", "b12", "b13", "b14", "b15"]
+        
+        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast"};
+        
+        var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[]};
+        
+        var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[]};
+        
+        var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[]};
+        
+        var northeast={type:"location", name:'northeast', description:'whole lotta nothing but in the northeast', south:"east", southwest:"entrance", west:"north", things:[]};
+        
+        var north={type:"location", name:'north', description:'whole lotta nothing but in the north. should be able to nav', navable:true, west:"northwest", southwest:"west", south:"entrance", southeast:"east", east:"northeast", things:[]};
+        
+        var northwest={type:"location", name:'northwest', description:'whole lotta nothing but in the northwest', south:"west", southeast:"entrance", east:"north", things:[]};
+        
+        var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[]};
+        
+        var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[]};
+        
+        var locations={entrance:entrance, south:south, southeast:southeast, east:east, northeast:northeast, north:north, northwest:northwest, west:west, southwest:southwest}
+        
+        var otherwiseStates=[];
+        
+        var player={maxHp:100, hp:100};
+        
+        var things={};
+        
+        var inlines={if:/^if /g, otherwiseIf:/^otherwise if /g, otherwise:/^otherwise(?! if )/g, oneOf:/^one of/g, at:/^at /g, or:/^or/g, endIf:/^end if/g};
+        
+        var newBranches={if:/^if /, oneOf:/^one of/};
+        
+        var descriptions={human:{head:"It's a head.", torso:"It's a body.", legs:"Some legs", skin:"Some skin"}};
+        
+        var doSomething={type:"action", name:"action", action:doFSAction};
+        entrance.things.something=doSomething;
+        
+        var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
+        var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
+        aThing.actions.fuck=fuck;
+        var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
+        aThing.actions.talk=talk;
+        addThing("entrance", "thing", aThing);
+        
+        var currentLocation=entrance;
+        
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}/*, single:{type:"option", value:false, others:[]}, option1:{type:"option", value:true, others:["option2"]}, option2:{type:"option", value false, others:["option1"]}*/}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}};
+        
+       // var definitions={submissive};
+        
+        data.player=player;
+        
+        var functions={test:testf}
+        
+        function defualtAppearance(){
+            var app={head:"human", torso:"human",  legs:"human", skin:"human", height:72, weight:3, breasts:{number:1, main:0, extras:[]}, vaginas:{number:0, main:0, extras:[]}, dicks:{number:0, main:0, extras:[]}}
+            return app;
+        }
+        
+        function isSubmissive(name){
+            return data[name].value == "submissive";
+        }
+        
+        
+        function addTime(time){
+            data.time.day=data.time.day+time.day;
+            data.time.hour=data.time.hour+time.hour;
+            data.time.minute=data.time.minute+time.minute;
+            
+            data.time.hour=data.time.hour+Math.floor(data.time.minute/60);
+            data.time.minute=data.time.minute % 60;
+            if(data.time.minute<0){
+                data.time.hour=data.time.hour;
+                data.time.minute=datat.time.minute+60;
+            }
+            
+            data.time.day=data.time.day+Math.floor(data.time.hour/24);
+            data.time.hour=data.time.hour % 24;
+            if(data.time.hour<0){
+                data.time.day=data.time.day;
+                data.time.hour=data.time.hour+24;
+            }
+        }
+        
+        function addRemaining(time){
+            data.remaining.day=data.remaining.day+time.day;
+            data.remaining.hour=data.remaining.hour+time.hour;
+            data.remaining.minute=data.remaining.minute+time.minute;
+            data.remaining.hour=data.remaining.hour+Math.floor(data.remaining.minute/60);
+            data.remaining.minute=data.remaining.minute % 60;
+            if(data.remaining.minute<0){
+                data.remaining.hour=data.remaining.hour;
+                data.remaining.minute=data.remaining.minute+60;
+            }
+            
+            data.remaining.day=data.remaining.day+Math.floor(data.remaining.hour/24);
+            data.remaining.hour=data.remaining.hour % 24;
+            if(data.remaining.hour<0){
+                data.remaining.day=data.remaining.day;
+                data.remaining.hour=data.remaining.hour+24;
+            }
+        }
+        
+        function finishTurn(time){
+            data.turn.value=data.turn.value+1;
+            addTime(time);
+            time.day=time.day*-1;
+            time.hour=time.hour*-1;
+            time.minute=time.minute*-1;
+            addRemaining(time);
+            
+            addToDisplay("updating");
+            updateHealth();
+            updateTime();
+            updateTurns();
+            updateRemaining();
+            addToDisplay("done");
+        }
+        
+        function displayTime(){
+            var half;
+            var hour;
+            var minute;
+            if(data.time.hour<12){
+                half="AM";
+                hour=data.time.hour;
+            }
+            else{
+                half="PM";
+                hour=data.time.hour-12;
+            }
+            if(hour == 0)
+                hour=12;
+            if(hour<10){
+                hour="0"+hour.toString();
+            }
+            else
+                hour=hour.toString();
+            minute="e";
+            if(data.time.minute==0)
+                minute="00";
+            else if(data.time.minute<10)
+                minute="0"+data.time.minute.toString();
+            else
+                minute=data.time.minute.toString();
+            return "Current time: "+hour+":"+minute+" "+half;
+        }
+        
+        function displayRemaining(){
+            var days;
+            var hour;
+            var minute;
+            days=data.remaining.day.toString();
+            days=days+"d";
+            hour=data.remaining.hour;
+            if(hour<10){
+                hour="0"+hour.toString();
+            }
+            else
+                hour=hour.toString();
+            hour=hour+"h";
+            minute="e";
+            if(data.remaining.minute==0)
+                minute="00";
+            else if(data.remaining.minute<10)
+                minute="0"+data.remaining.minute.toString();
+            else
+                minute=data.remaining.minute.toString();
+            minute=minute+"m";
+            return "Time left: "+days+" "+hour+" "+minute;
+        }
+        
+        function testEventF(){
+            addToDisplay("I'm a test event function");
+        }
+        
+        function displayTurns(){
+            return "Turn: "+data.turn.value;
+        }
+        
+        
+        function updateTime(){
+            document.getElementById("time").innerHTML=displayTime();
+        }
+        
+        function updateHealth(){
+            document.getElementById("health").innerHTML=displayHealth();
+        }
+        
+        function updateTurns(){
+            document.getElementById("turns").innerHTML=displayTurns();
+        }
+        
+        function updateRemaining(){
+            document.getElementById("remaining").innerHTML=displayRemaining();
+        }
+        
+        function addThing(loc, name, thing){
+            locations[loc].things[name]=thing;
+            things[name]=thing;
+        }
+        
+        function doFSAction(){
+            addToDisplay("Something happened, but what?");
+        }
+        function addToDisplay(text) {
+            var display = document.getElementById("display");
+            curdisplay=curdisplay+text+"<hr />"; 
+            display.innerHTML=curdisplay; 
+            display.scrollTop = display.scrollHeight;
+        }
+        
+        function displayHealth(){
+            return "Health: "+data.player.hp+"/"+data.player.maxHp;
+        }
+        
+        function addToDisplayNoLine(text){
+            var display = document.getElementById("display");
+            curdisplay=curdisplay+text+"<br />"; 
+            display.innerHTML=curdisplay; 
+            display.scrollTop = display.scrollHeight;
+        }
+        
+        function clearDisplay() {
+            curdisplay=""; 
+            document.getElementById("display").innerHTML=curdisplay; 
+        }
+        
+        function displaySmut(){
+            var display = document.getElementById("display");
+            curdisplay=curdisplay+'<img src="testpic.jpg">'+"<hr />";
+            display.innerHTML=curdisplay; 
+            display.scrollTop = display.scrollHeight;
+        }
+        
+        function describeLocation(locName){
+            addToDisplayNoLine("<b>"+locations[locName].name+"</b>");
+            addToDisplay(locations[locName].description);
+        }
+        
+        function describeCurrentLocation(){
+            addToDisplayNoLine("<b>"+currentLocation.name+":</b>");
+            addToDisplay(currentLocation.description);
+        }
+        
+        function goNorth(){
+            setLocation(currentLocation.north);
+        }
+        
+        function goSouth(){
+            setLocation(currentLocation.south);
+        }
+        function goEast(){
+            setLocation(currentLocation.east);
+        }
+        
+        function goWest(){
+            setLocation(currentLocation.west);
+        }
+        
+        function goNorthEast(){
+            setLocation(currentLocation.northeast);
+        }
+        
+        function goSouthEast(){
+            setLocation(currentLocation.southeast);
+        }
+        function goNorthWest(){
+            setLocation(currentLocation.northwest);
+        }
+        
+        function goSouthWest(){
+            setLocation(currentLocation.southwest);
+        }
+        
+        function setLocation(locName){
+            currentLocation=locations[locName];
+            setButtonsTravel();
+            describeCurrentLocation();
+        }
+        
+        function setButtonsTravel(){
+            disableAllButtons();
+            var b1=document.getElementById("b1");
+            if('northwest' in currentLocation){
+                enableButton(b1, "northwest", goNorthWest);
+            }
+            var b2=document.getElementById("b2");
+            if('north' in currentLocation){
+                enableButton(b2, "north", goNorth);
+            }
+            var b3=document.getElementById("b3");
+            if('northeast' in currentLocation){
+                enableButton(b3, "northeast", goNorthEast);
+            }
+            
+            enableButton(document.getElementById("b4"), "speak", sayHello);
+            
+            enableButton(document.getElementById("b5"), "smut", displaySmut);
+            
+            var b6=document.getElementById("b6");
+            if('west' in currentLocation){
+                enableButton(b6, "west", goWest);
+            }
+            
+            enableButton(document.getElementById("b7"), "current", describeCurrentLocation);
+            
+            var b8=document.getElementById("b8");
+            if('east' in currentLocation){
+                enableButton(b8, "east", goEast);
+            }
+            
+            enableButton(document.getElementById("b9"), "clear", clearDisplay);
+            
+            enableButton(document.getElementById("b10"), "debug", debugTest);
+            
+            var b11=document.getElementById("b11");
+            if('southwest' in currentLocation){
+                enableButton(b11, "southwest", goSouthWest);
+            }
+            var b12=document.getElementById("b12");
+            if('south' in currentLocation){
+                enableButton(b12, "south", goSouth);
+            }
+            var b13=document.getElementById("b13");
+            if('southeast' in currentLocation){
+                enableButton(b13, "southeast", goSouthEast);
+            }
+            
+            var b14=document.getElementById("b14");
+            if('navable' in currentLocation){
+                enableButton(b14, "navigate", navRaped);
+            }
+            
+            enableButton(document.getElementById("b15"), "actions", setButtonsActions);
+        }
+        
+        function setButtonsActions(){
+            disableAllButtons();
+            
+            var b1=document.getElementById("b1");
+            if('huntable' in currentLocation){
+                enableButton(b1, "hunt", huntRaped);
+            }
+            
+            var b2=document.getElementById("b2");
+            if('explorable' in currentLocation){
+                enableButton(b2, "explore", exploreRaped);
+            }
+            
+            var b3=document.getElementById("b3");
+            if('scavengable' in currentLocation){
+                enableButton(b3, "scavenge", scavengeRaped);
+            }
+            
+            var i=0;
+            var things=currentLocation.things;
+            var thing;
+            for(var key in things){
+                thing=things[key];
+                if(thing.type == "action"){
+                    thing.action();
+                    enableButton(document.getElementById(buttonNames[5+i]), thing.name, thing.action);
+                }
+                else if(thing.type == "thing"){
+                    enableButton(document.getElementById(buttonNames[5+i]), thing.name, function (){lookAtThing(thing);});
+                }
+                i++;
+            }
+            
+            enableButton(document.getElementById("b15"), "move", setButtonsTravel);
+        }
+        
+        function disableAllButtons(){
+            var i;
+            for(i=0; i<buttonNames.length; i++){
+                disableButton(document.getElementById(buttonNames[i]));
+            }
+        }
+        
+        function enableButton(b, n, f){
+            b.innerHTML=n;
+            b.disabled=false;
+            b.onclick=f;
+        }
+        
+        function disableButton(b){
+            b.innerHTML="<br />";
+            b.disabled=true;
+        }
+        
+        function sayHello(){
+            addToDisplay("Hello");
+        }
+        
+        function debugTest(){
+            finishTurn({day:0, hour:4, minute:30});
+        }
+        
+        function navRaped(){
+            addToDisplay("Yay you went somewhere and got raped");
+        }
+        
+        function exploreRaped(){
+            addToDisplay("Yay you found something and got raped");   
+        }
+        
+        function scavengeRaped(){
+            addToDisplay("Yay you scavenged something and got raped");   
+        }
+        
+        function huntRaped(){
+            addToDisplay("Yay you hunted something and got raped");   
+        }
+        
+        function testf(){
+            return "testf";
+        }
+        
+        function displayActions(actions){
+            disableAllButtons();
+            var i=0;
+            for(var key in actions){
+                enableButton(document.getElementById(buttonNames[i]), actions[key].name, actions[key].action);
+                i++;
+            }
+        }
+        
+        function lookAtThing(thing){
+            addToDisplay(thing.description);
+            displayActions(thing.actions);
+            enableButton(document.getElementById("b15"), "back", setButtonsActions);
+        }
+        
+        function getRandom(a,b){
+            var r=a+Math.floor(Math.random()*(b+1-a));
+            if(r>b)
+                return b;
+            return r;
+        }
+        
+        function parseParenInput(input){
+            var res=input.split(/(?=\()|\)/)
+            var i;
+            for(i=1; i<res.length;i++){
+                if(!(/^\(/.test(res[i]))){
+                    res[i]=")"+res[i];
+                }
+            }
+            var ret=[];
+            for(i=0; i<res.length; i++){
+                if(/^\(/.test(res[i])){
+                    ret.push("(");
+                    var rest=res[i].replace("(","")
+                    if(/\w/.test(rest))
+                        ret.push(rest);
+                }
+                else if(/^\)/.test(res[i])){
+                    ret.push(")");
+                    var rest=res[i].replace(")","")
+                    if(/\w/.test(rest))
+                        ret.push(rest);
+                }
+                else{
+                    ret.push(res[i]);
+                }
+            }
+            var paren=parseParen(ret);
+            var simp=evaluateExpression(paren.inside);
+            return simp;
+        }
+        
+    
+        
+        function parseSimpleExpression(exp){
+            var res=exp.split(/(?=and |or )/);
+            var ret=[];
+            for(i=0; i<res.length; i++){
+                if(/^and /.test(res[i])){
+                    ret.push("and");
+                    var rest=res[i].replace("and ","")
+                    if(/\w/.test(rest))
+                        ret.push(rest.trim());
+                }
+                else if(/^or /.test(res[i])){
+                    ret.push("or");
+                    var rest=res[i].replace("or ","")
+                    if(/\w/.test(rest))
+                        ret.push(rest.trim());
+                }
+                else{
+                    ret.push(res[i].trim());
+                }
+            }
+            for(i=0; i<ret.length; i=i+2){
+                ret[i]=evaluateBoolean(ret[i]);
+            }
+            var simp= evaluateSimpleExpression(ret);
+            return simp;
+        }
+        
+        function evaluateSimpleExpression(exp){
+            if(exp.length==1)
+                return exp[0];
+            var first=exp.shift();
+            var op=exp.shift();
+            var ret=evaluateSimpleExpression(exp);
+            if(op == "or")
+                return first || ret;
+            return first && ret;
+        }
+        
+        function evaluateExpression(exp){
+            var i;
+            for(i=0; i<exp.length; i++){
+                if(exp[i].type == "paren"){
+                    exp[i]=" "+evaluateExpression(exp[i].inside)+" ";
+                }
+            }
+            var total="";
+            for(i=0; i<exp.length; i++){
+                total=total+exp[i];
+            }
+            return parseSimpleExpression(total).toString();
+        }
+        
+        function parseParen(toParse){
+            if(toParse.length==0){
+                return {type:"expression", inside:[]}
+            }
+            var next=toParse.shift();
+            if(next=="("){
+                var nextRet=parseParen(toParse);
+                var newParen={type:"paren", inside:nextRet.inside};
+                var ret=parseParen(nextRet.remaining);
+                ret.inside.unshift(newParen);
+                return ret;
+            }
+            else if(next==")"){
+                var ret={inside:[], remaining:toParse};
+                return ret;
+            }
+            else{
+                var nextRet=parseParen(toParse);
+                nextRet.inside.unshift(next);
+                return nextRet;
+            }
+        }
+        
+        function parseInput(input){
+           var res = input.split(/\[|\]/);
+            var items=[];
+            var newkey;
+            var isspecial=false;
+            for(var key in res){
+                if(isspecial){
+                    newkey={type:"special", value:res[key]};
+                    var foundMatch=false;
+                    for(key in inlines){
+                        if(inlines[key].test(newkey.value)){
+                            newkey.stype=key;
+                            foundMatch=true;
+                            newkey.value=newkey.value.replace(inlines[key], "");
+                        }
+                        if(!foundMatch)
+                            newkey.stype="other";
+                    }
+                    isspecial=false;
+                }
+                else{
+                    newkey={type:"string", value:res[key]};
+                    isspecial=true;
+                }
+                if(newkey.value != "" || newkey.type == "special")
+                    items.push(newkey);
+            }
+            return parseStatements(items);
+        }
+        
+        function getValue(input){
+            addToDisplay("value :"+input);
+            if(!isNaN(input)){
+                addToDisplay("number");
+                return input;
+            }
+            if(/"/.test(input)){
+                input=input.replace(/"/g, "");
+                return input;
+            }
+            if(input in functions){
+                return functions[input]();
+            }
+            var lookups=input.split(/ of /);
+            var i;
+            var found=data;
+            addToDisplay("l l "+lookups.length);
+            for(i=lookups.length-1; i>=0; i--){
+                found=found[lookups[i].trim()];
+                addToDisplay("type "+found.type);
+            }
+            addToDisplay(found.value);
+            return found.value;
+        }
+        
+        function lessThan(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return parseInt(getValue(strings[0])) < parseInt(getValue(strings[1]));
+        }
+        
+        function lessThanEqualTo(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return parseInt(getValue(strings[0])) <= parseInt(getValue(strings[1]));
+        }
+        
+        function greaterThanEqualTo(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return parseInt(getValue(strings[0])) >= parseInt(getValue(strings[1]));
+        }
+        
+        function greaterThan(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return parseInt(getValue(strings[0])) > parseInt(getValue(strings[1]));
+        }
+        
+        function is(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return getValue(strings[0]) == getValue(strings[1]);
+        }
+        
+        function isNot(strings){
+            strings[0]=strings[0].trim();
+            strings[1]=strings[1].trim();
+            return getValue(strings[0]) != getValue(strings[1]);
+        }
+        
+        function evaluateBoolean(statement){
+            if(statement == "true")
+                return true;
+            if(statement == "false")
+                return false;
+            if(/\</.test(statement)){
+               return lessThan(statement.split("<"));
+            }
+            if(/\<=/.test(statement)){
+               return lessThanEqualTo(statement.split("<="));
+            }
+            if(/\>/.test(statement)){
+               return greaterThan(statement.split(">"));
+            }
+            if(/\>=/.test(statement)){
+               return greaterThanEqualTo(statement.split(">="));
+            }
+            if(/ is not /.test(statement)){
+               return isNot(statement.split(" is not "));
+            }
+            if(/ is /.test(statement)){
+               return is(statement.split(" is "));
+            }
+        }
+        
+        function evaluateIf(ifs){
+            if(ifs.stype == "otherwise"){
+                return ifs.onAlways;
+            }
+            if(parseParenInput(ifs.value) == "true"){
+                return ifs.onTrue;
+            }
+            else{
+                return evaluateIf(ifs.onFalse);
+            }
+        }
+        
+        function evaluateStatement(statement, i){
+            if(statement.length == i)
+                return "";
+            var next=statement[i];
+            var ret=evaluateStatement(statement, i+1);
+            if(next.type == "string"){
+                return next.value+ret;
+            }
+            if(next.stype == "if"){
+                var ifeval=evaluateIf(next);
+                ifeval=evaluateStatement(ifeval, 0);
+                return ifeval+ret;
+            }
+            if(next.stype == "oneOf"){
+                if(next.pickType == "random"){
+                    onePick=next.options[getRandom(0,next.options.length-1)].inside;
+                }
+                else if(next.pickType == "sticky random"){
+                    onePick=next.options[otherwiseStates[next.id]].inside;
+                }
+                else if(next.pickType == "decreasing"){
+                    var r=getRandom(1,((next.options.length+1)*(next.options.length))/2);
+                    var i;
+                    var pick=-1;
+                    for(i=next.options.length; i>0&&pick==-1; i--){
+                        if(r<=i)
+                            pick=next.options.length-i;
+                        r=r-next.options.length;
+                    }
+                    onePick=next.options[pick].inside;
+                }
+                else if(next.pickType == "stopping"){
+                    var pick=otherwiseStates[next.id];
+                    onePick=next.options[pick].inside;
+                    if(pick<next.options.length-1){
+                        otherwiseStates[next.id]=pick+1;
+                    }
+                }
+                else if(next.pickType == "purely random"){
+                    if(otherwiseStates[next.id].free.length==0){
+                        otherwiseStates[next.id].free=otherwiseStates[next.id].used;
+                        otherwiseStates[next.id].used=[];
+                    }
+                    var r=getRandom(0, otherwiseStates[next.id].free.length-1);
+                    var i=otherwiseStates[next.id].free[r];
+                    onePick=next.options[i].inside;
+                    otherwiseStates[next.id].free.splice(r,1);
+                    otherwiseStates[next.id].used.push(i);
+                }
+                onePick=evaluateStatement(onePick,0);
+                return onePick+ret;
+            }
+            if(next.stype == "other"){
+                var ret=evaluateStatement(statement, i+1);
+                return getValue(next.value)+ret;
+            }
+            addToDisplay("ERROR");
+            return "";
+        }
+        
+        function parseStatements(toParse){
+            if(toParse.length==0){
+                return {type:"special", stype:"actions", inside:[]};
+            }
+            var next=toParse.shift();
+            if(next.type == "string"){
+                var nextRet=parseStatements(toParse);
+                nextRet.inside.unshift(next);
+                return nextRet;
+            }
+            else{
+                if(next.stype == "endIf"){
+                    var ret={remaining:toParse, inside:[], found:next};
+                    return ret;
+                }
+                else if(next.stype == "otherwise"){
+                    var nextRet=parseStatements(toParse);
+                    next.onAlways=nextRet.inside;
+                    var ret={remaining:toParse, inside:[], found:next};
+                    return ret;
+                }
+                else if(next.stype == "otherwiseIf"){
+                    var nextRet=parseStatements(toParse);
+                    next.onTrue=nextRet.inside;
+                    if(nextRet.found.stype == "endIf")
+                        next.onFalse={type:"special", stype:"otherwise", value:"otherwise", onAlways:[]};
+                    else
+                        next.onFalse=nextRet.found;
+                    var ret={remaining:toParse, inside:[], found:next};
+                    return ret;
+                }
+                else if(next.stype == "if"){
+                    var nextRet=parseStatements(toParse);
+                    next.onTrue=nextRet.inside;
+                    if(nextRet.found.stype == "endIf"){
+                        next.onFalse={type:"special", stype:"otherwise", value:"otherwise", onAlways:[]};
+                    }
+                    else{
+                        next.onFalse=nextRet.found;
+                    }
+                    var ret=parseStatements(nextRet.remaining);
+                    ret.inside.unshift(next);
+                    return ret;
+                }
+                else if(next.stype == "at"){
+                    var ret={remaining:toParse, inside:[], found:next, options:[]}
+                    return ret;
+                }
+                else if(next.stype == "or"){
+                    var nextRet=parseStatements(toParse);
+                    next.inside=nextRet.inside;
+                    nextRet.inside=[];
+                    nextRet.options.unshift(next);
+                    return nextRet;
+                }
+                else if(next.stype == "oneOf"){
+                    var nextRet=parseStatements(toParse);
+                    next.options=nextRet.options;
+                    var newOr={type:"special", stype:"or", inside:nextRet.inside};
+                    next.options.unshift(newOr);
+                    next.pickType=nextRet.found.value;
+                    next.id=otherwiseStates.length;
+                    if(next.pickType=="random"){
+                        otherwiseStates.push({});
+                    }
+                    else if(next.pickType=="purely random"){
+                        var list=[];
+                        var i;
+                        for(i=0; i<next.options.length;i++){
+                            list.push(i);
+                        }
+                        otherwiseStates.push({free:list, used:[]});
+                    }
+                    else if(next.pickType=="sticky random"){
+                        var stick=getRandom(0,next.options.length-1);
+                        otherwiseStates.push(stick);
+                    }
+                    else if(next.pickType=="stopping"){
+                        otherwiseStates.push(0);
+                    }
+                    else if(next.pickType=="decreasing"){
+                        otherwiseStates.push([]);
+                    }
+                    var ret=parseStatements(nextRet.remaining);
+                    ret.inside.unshift(next);
+                    return ret;
+                }
+                else{
+                    var nextRet=parseStatements(toParse);
+                    nextRet.inside.unshift(next);
+                    return nextRet;
+                }
+            }
+            return [];
+        }
+    </script>
+    <style>
+        #game {
+            background-color: lightgrey;
+            width: 600px;
+            height: 800px;
+            padding: 10px;
+            border: 3px solid black;
+            margin: 25px;
+        }
+        
+        #info {
+            background-color: white;
+            width:566px;
+            height:100px;
+            padding:10px;
+            margin:5px;
+            border: 3px solid black;
+            align-content: center;
+        }
+        
+        #health {
+            background-color: white;
+            width:165px;
+            height:20px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            float:left;
+        }
+        
+        #turns {
+            background-color: white;
+            width:175px;
+            height:20px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            float:left;
+        }
+        
+        #time {
+            background-color: white;
+            width:165px;
+            height:20px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            float:left;
+        }
+        
+        #remaining {
+            background-color: white;
+            width:165px;
+            height:20px;
+            padding:0px;
+            margin:5px;
+            align-content: center;
+            float:left;
+        }
+        
+        #display {
+            background-color: white;
+            width:566px;
+            height:450px;
+            padding:10px;
+            margin:5px;
+            border: 3px solid black;
+            align-content: center;
+            overflow-y: scroll
+        }
+        
+        #buttons {
+            background-color: white;
+            width:566px;
+            height:150px;
+            padding:10px;
+            margin:5px;
+            border: 3px solid black;
+            align-content: center;
+        }
+        
+        button {
+            width: 100px;
+            height: 40px;
+            margin: 5px;
+            padding:0px;
+        }
+        
+        #title {
+            text-align: center
+        }
+</style>
+</head>
+<body>
+    <div id="game">
+        <div id="info">
+            <p id="health">health</p>
+            <p id="time">time</p>
+            <p id="turns">turns</p>
+            <p id="remaining">remaining</p>
+        </div>
+        <div id="display">All your smut goes here.  All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here. All your smut goes here.
+        </div>
+        <div id="buttons">
+            <button id="b1" onclick="goNorthWest()" type="button" class="actor">northwest</button>
+            <button id="b2" onclick="goNorth()" type="button" class="actor">north</button>
+            <button id="b3" onclick="goNorthEast()" type="button" class="actor">northeast</button>
+            <button id="b4" onclick="sayHello()" type="button" class="actor">speak</button>
+            <button id="b5" onclick="displaySmut()" type="button" class="actor">smut</button>
+            <button id="b6" onclick="goWest()" type="button" class="actor">west</button>
+            <button id="b7" onclick="describeCurrentLocation()" type="button" class="actor">current</button>
+            <button id="b8" onclick="goEast()" type="button" class="actor">east</button>
+            <button id="b9" onclick="clearDisplay()" type="button" class="actor">clear</button>
+            <button id="b10" onclick="debugTest()" type="button" class="actor">debug test</button>
+            <button id="b11" onclick="goSouthWest()" type="button" class="actor">southwest</button>
+            <button id="b12" onclick="goSouth()" type="button" class="actor">south</button>
+            <button id="b13" onclick="goSouthEast()" type="button" class="actor">southeast</button>
+            <button id="b14" onclick="navRaped()" type="button" class="actor">navigate</button>
+            <button id="b15" onclick="setButtonsActions()" type="button" class="actor">actions</button>
+        </div>
+    </div>
+</body>
+</html>
