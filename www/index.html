@@ -63,23 +63,21 @@
         
         var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[], monsters:[]};
         
-        var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[]};
+        var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[], events:[], monsters:[]};
         
-        var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[]};
+        var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[], events:[], monsters:[]};
         
-        var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[]};
+        var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[], events:[], monsters:[]};
         
-        var northeast={type:"location", name:'northeast', description:'whole lotta nothing but in the northeast', south:"east", southwest:"entrance", west:"north", things:[]};
+        var northeast={type:"location", name:'northeast', description:'whole lotta nothing but in the northeast', south:"east", southwest:"entrance", west:"north", things:[], events:[], monsters:[]};
         
-        var north={type:"location", name:'north', description:'whole lotta nothing but in the north. should be able to nav', navable:true, west:"northwest", southwest:"west", south:"entrance", southeast:"east", east:"northeast", things:[]};
+        var north={type:"location", name:'north', description:'whole lotta nothing but in the north. should be able to nav', navable:true, west:"northwest", southwest:"west", south:"entrance", southeast:"east", east:"northeast", things:[], events:[], monsters:[]};
         
-        var northwest={type:"location", name:'northwest', description:'whole lotta nothing but in the northwest', south:"west", southeast:"entrance", east:"north", things:[]};
+        var northwest={type:"location", name:'northwest', description:'whole lotta nothing but in the northwest', south:"west", southeast:"entrance", east:"north", things:[], events:[], monsters:[]};
         
-        var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[]};
+        var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[]};
         
-        var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[]};
-        
-        var locations={entrance:entrance, south:south, southeast:southeast, east:east, northeast:northeast, north:north, northwest:northwest, west:west, southwest:southwest}
+        var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[]};
         
         var otherwiseStates=[];
         
@@ -107,7 +105,17 @@
         
         var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox"}, huskyBitch:{type:"monster", name:"husky bitch"}};
         
-        data.entrance=entrance;
+        var data="test";
+        
+        /*data.entrance=entrance;
+        data.north=north;
+        data.northwest=northwest;
+        data.northeast=northeast;
+        data.west=west;
+        data.east=east;
+        data.south=south;
+        data.southwest=southwest;
+        data.southeast=southeast;*/
         data.entrance.events.push("testE1");
         data.entrance.events.push("testE2");
         data.entrance.monsters.push("latexFox");
@@ -382,12 +390,15 @@
         }
         
         function describeCurrentLocation(){
-            addToDisplayNoLine("<b>"+currentLocation.name+":</b>");
-            addToDisplay(currentLocation.description);
+            addToDisplay("describe");
+            addToDisplay(data);
+            addToDisplay(data.currentLocation.value);
+            addToDisplayNoLine("<b>"+data[data.currentLocation.value].name+":</b>");
+            addToDisplay(data[data.currentLocation.value].description);
         }
         
         function goNorth(){
-            setLocation(currentLocation.north);
+            setLocation(data[data.currentLocation.value].north);
         }
         
         function goSouth(){
@@ -536,6 +547,7 @@
         }
         
         function debugTest(){
+            addToDisplay(data);
             nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
             var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
