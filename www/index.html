@@ -61,7 +61,7 @@
         var curdisplay="INITIAL<br />";
         var buttonNames=["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10", "b11", "b12", "b13", "b14", "b15"]
         
-        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[]};
+        var entrance={type:"location", name:'entrance', description:'whole lotta nothing except for a thing and the ability to do an action. should be able to nav,explore,scavange, and hunt', things:[], navable:true, explorable:true, scavengable:true, huntable:true, north:"north", northwest:"northwest", west:"west", southwest:"southwest", south:"south", southeast:"southeast", east:"east", northeast:"northeast", events:[], monsters:[]};
         
         var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[], events:[], monsters:[]};
         
@@ -103,7 +103,7 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox"}, huskyBitch:{type:"monster", name:"husky bitch"}};
         
         var data="test";
         
@@ -118,6 +118,8 @@
         data.southeast=southeast;*/
         data.entrance.events.push("testE1");
         data.entrance.events.push("testE2");
+        data.entrance.monsters.push("latexFox");
+        data.entrance.monsters.push("huskyBitch");
         
         var definitions={submissive:isSubmissive};
         
@@ -136,11 +138,39 @@
             return usable;
         }
         
+        function getMonsters(monsters){
+            var usable=[];
+            var monster;
+            for(var key in monsters){
+                monster=data[monsters[key]];
+                if(monsterUsable(monster))
+                    usable.push(monster);
+            }
+            return usable;
+        }
+        
+        function fightMonster(monster){
+            addToDisplay("You fought a "+monster.name+" and lost.  Then suprise you got raped.");
+        }
+        
         function explore(area){
-            addToDisplay(area);
-            var usable=getEvents(data[area].events);
-            var indx=getRandom(0,usable.length-1);
-            usable[indx]();
+            addToDisplay("you started exploring "+area+"...");
+            if(Math.random()<data.exploreChance.value){
+                var usable=getEvents(data[area].events);
+                var indx=getRandom(0,usable.length-1);
+                usable[indx]();
+            }
+            if(Math.random()<data.fightChance.value){
+                var usable=getMonsters(data[area].monsters);
+                var indx=getRandom(0,usable.length-1);
+                fightMonster(usable[indx]);
+            }
+            addToDisplay("you returned to "+data.currentLocation.value+" after exploring");
+            finishTurn({day:0, hour:2, minute:0});
+        }
+        
+        function monsterUsable(monster){
+            return true;
         }
         
         function eventUsable(event){
