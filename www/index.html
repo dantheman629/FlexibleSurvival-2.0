@@ -78,7 +78,7 @@
         var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[]};
         
         var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[]};
-        var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', things:[], events:[], monsters:[]};
+        var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', navable:true, things:[], events:[], monsters:[]};
         
         var otherwiseStates=[];
         
@@ -97,7 +97,7 @@
         
         var currentLocation=entrance;
         
-        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.")}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox")}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.")}, maxHp:50, attack:10}, huskyBitch:{type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.")}, submitScene:function (){addToDisplay("You submit and get fucked by a husky")}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.")}, maxHp:100, attack:5}, navLocs:["entrance"], combatState:{name:"latexFox", maxHp:0, hp:0}};
+        var data={simpletest:{type:"text", value:"hi"}, simple:{type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}}, turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, testE1:{type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, testE2:{type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, latexFox:{type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.")}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox")}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.")}, maxHp:50, attack:10}, huskyBitch:{type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.")}, submitScene:function (){addToDisplay("You submit and get fucked by a husky")}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.")}, maxHp:100, attack:5}, navLocs:["entrance", "north", "mall"], combatState:{name:"latexFox", maxHp:0, hp:0}};
         
         
         data.entrance=entrance;
@@ -109,10 +109,13 @@
         data.south=south;
         data.southwest=southwest;
         data.southeast=southeast;
+        data.mall=mall;
         data.entrance.events.push("testE1");
         data.entrance.events.push("testE2");
         data.entrance.monsters.push("latexFox");
         data.entrance.monsters.push("huskyBitch");
+        data.mall.monsters.push("latexFox");
+        data.mall.monsters.push("huskyBitch");
         
         var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
         var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
@@ -146,6 +149,24 @@
         
         function victory(){
             addToDisplay("you win and fuck the monster.");
+        }
+        
+        function startNav(area){
+            addToDisplay(area);
+            addToDisplay("You start travelling to "+area+".");
+            if(Math.random()<data.fightChance.value){
+                var usable=getMonsters(data[data.currentLocation.value].monsters);
+                var indx=getRandom(0,usable.length-1);
+                fightMonster(usable[indx], function (){finishNav(area)});
+            }
+            else
+                finishNav(area);
+        }
+        
+        function finishNav(area){
+            data.currentLocation.value=area;
+            addToDisplay("You arrive at "+area+".");
+            setButtonsTravel();
         }
         
         function startCombat(){
@@ -557,6 +578,15 @@
             enableButton(document.getElementById("b4"), "flee", function(){combatTurn("flee")});
         }
         
+        function setButtonsNavigate(){
+            disableAllButtons();
+            var test;
+            var i;
+            for(i=0; i<data.navLocs.length;i++){
+                enableButton(document.getElementById(buttonNames[i]), data.navLocs[i], function(){startNav(this.innerHTML);});
+            }
+        }
+        
         function combatTurn(action){
             if(action == "submit"){
                 data.combatState.monster.submitScene();
@@ -665,6 +695,7 @@
         
         function debugTest(){
             data.player.hp=data.player.maxHp;
+            startNav("north");
             /*nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
             var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
@@ -673,7 +704,7 @@
         }
         
         function navRaped(){
-            addToDisplay("Yay you went somewhere and got raped");
+            setButtonsNavigate();
         }
         
         function exploreRaped(){
