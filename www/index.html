@@ -178,8 +178,8 @@
             return usable;
         }
         
-        function fightMonster(monster){
-            addToDisplay("You fought a "+monster.name+" and lost.  Then suprise you got raped.");
+        function fightMonster(monster, afterCombat){
+            setCombat(monster, afterCombat);
         }
         
         function updatePlayerCombat(){
@@ -196,7 +196,7 @@
             document.getElementById("combatEnemy").innerHTML=disp;
         }
         
-        function explore(area){
+        function startExplore(area){
             addToDisplay("you started exploring "+area+"...");
             if(Math.random()<data.exploreChance.value){
                 var usable=getEvents(data[area].events);
@@ -206,8 +206,14 @@
             if(Math.random()<data.fightChance.value){
                 var usable=getMonsters(data[area].monsters);
                 var indx=getRandom(0,usable.length-1);
-                fightMonster(usable[indx]);
+                fightMonster(usable[indx], finishExplore);
             }
+            else
+                finishExplore();
+        }
+        
+        function finishExplore(){
+            setButtonsTravel();
             addToDisplay("you returned to "+data.currentLocation.value+" after exploring");
             finishTurn({day:0, hour:2, minute:0});
         }
@@ -658,7 +664,7 @@
         }
         
         function debugTest(){
-            setCombat(data["huskyBitch"], setButtonsTravel);
+            data.player.hp=data.player.maxHp;
             /*nowIs("simple", "testOp");
             finishTurn({day:0, hour:4, minute:30});
             var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if]");
@@ -671,7 +677,7 @@
         }
         
         function exploreRaped(){
-            explore(data.currentLocation.value);
+            startExplore(data.currentLocation.value);
         }
         
         function scavengeRaped(){
@@ -1196,7 +1202,6 @@
             padding:0px;
             margin:5px;
             align-content: center;
-            border: 1px solid black;
             float:left;
         }
         
@@ -1207,7 +1212,6 @@
             padding:0px;
             margin:5px;
             align-content: center;
-            border: 1px solid black;
             float:right;
         }
         
@@ -1252,4 +1256,7 @@
         </div>
     </div>
 </body>
+    <script>
+        finishTurn({day:0, hour:0, minute:0});
+    </script>
 </html>
