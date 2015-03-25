@@ -1,5 +1,8 @@
 
-var data={turn:{type:"number", value:0}, time:{day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, navLocs:["entrance", "north", "mall"], combatState:{name:"latexFox", maxHp:0, hp:0}};
+var data={turn:{type:"number", value:0}, time:{type:"time", day:0, hour:12, minute:0}, remaining:{day:0, hour:12, minute:0}, currentLocation:{type:"text", value:"entrance"}, exploreChance:{type:"number", value:0.5}, fightChance:{type:"number", value:0.5}, navLocs:["entrance", "north", "mall"], combatState:{name:"latexFox", maxHp:0, hp:0}};
+
+var savableData=[{name:"turn", type:"number"}, {name:"currentLocation", type:"text"}, {name:"exploreChance", type:"number"}, {name:"fightChance", type:"number"}];
+];
 
 var otherwiseStates=[];
         

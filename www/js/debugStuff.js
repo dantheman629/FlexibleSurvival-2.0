@@ -87,3 +87,15 @@ aThing.actions.fuck=fuck;
 var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
 aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
+
+function debugTest(){
+    addToDisplay("testing");
+    if(localStorage.getItem("s1 turns"))
+        localStorage.setItem("s1 turns",parseInt(localStorage.getItem("s1 turns"))+1);
+    else
+        localStorage.setItem("s1 turns",1);
+    
+    addToDisplay(localStorage.getItem("s1 turns"));
+   /* addToDisplay("starting");
+    defer();*/
+}
