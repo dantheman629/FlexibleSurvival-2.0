@@ -87,15 +87,3 @@ aThing.actions.fuck=fuck;
 var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
 aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
-
-function debugTest(){
-    addToDisplay(inlines);
-    testSplit();
-    nowIs("simple", "testOp");
-    finishTurn({day:0, hour:4, minute:30});
-    addToDisplay("parsing");
-    var statement=parseInput("[if submissive is submissive]YAY[if simpletest is \"hi\"] it worked.[if simple is testOp]  I'm so happy.[if simple is not testOp2 and simple is not testOp1] FUCK YAY.[end if][end if][end if][end if][if turn is 1]Just started game.[otherwise if turn <= 5]Game is going along.[otherwise]omg just end it already.[end if]");
-    addToDisplay("parsed");
-    var output=evaluateStatement(statement.inside,0);
-    addToDisplay(output);
-}
