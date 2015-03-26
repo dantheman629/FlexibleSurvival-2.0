@@ -109,19 +109,6 @@ When Play begins:
 	blank out the nocturnal entry;		[ True=Nocturnal (night encounters only), False=Diurnal (day encounters only), blank for both. ]
 	now altcombat entry is "default";		[ Row used to designate any special combat features, "default" for standard combat. ]
 
-[
-when play ends:
-	if bodyname of player is "Template":
-		if humanity of player is less than 10:
-			say "     You succumb to your template infection.";
-		otherwise:
-			say "     You survive, but were infected by the template.";
-			if cocks of player > 0:							[MALE/HERM]
-				say "     Additional text for a male/herm survivor.";
-			otherwise if "Sterile" is not listed in feats of player:	[F-BREEDABLE]
-				say "     Additional text for a female survivor who can become preggers.";
-			otherwise:									[F-STERILE]
-				say "     Additional text for a female survivor who cannot become preggers.";
-]
+
 
 Giraffe for FS ends here.
