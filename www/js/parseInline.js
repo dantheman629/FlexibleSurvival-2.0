@@ -2,6 +2,8 @@ function testSplit(test){
     addToDisplay("testing");
 }
 
+var test="hello";
+
 function parseInput(input){
     addToDisplay(input);
     var res = input.split(/\[|\]/);

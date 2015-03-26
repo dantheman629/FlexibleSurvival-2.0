@@ -75,7 +75,10 @@ function finishTurn(time){
     time.hour=time.hour*-1;
     time.minute=time.minute*-1;
     addRemaining(time);
+    updateAll();
+}
 
+function updateAll(){
     updateHealth();
     updateTime();
     updateTurns();

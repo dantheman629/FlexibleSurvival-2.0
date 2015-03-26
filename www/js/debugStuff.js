@@ -1,9 +1,19 @@
 data.simpletest={type:"text", value:"hi"};
+
 data.simple={type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}};
+
 data.testE1={type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}};
+
 data.testE2={type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}};
+
 data.latexFox={type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.")}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox")}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.")}, maxHp:50, attack:10};
+
 data.huskyBitch={type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.")}, submitScene:function (){addToDisplay("You submit and get fucked by a husky")}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.")}, maxHp:100, attack:5};
+
+data.testBoolArray={type:"boolean list", value:[false, false, false]};
+savableData.push({name:"testBoolArray", type:"boolean list"});
+data.testText={type:"text", value:"hello there"};
+savableData.push({name:"testText", type:"text"});
 
 function testEvent1(){
     addToDisplay("While exploring something happened that invloved you getting raped");
@@ -89,13 +99,5 @@ aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
 
 function debugTest(){
-    addToDisplay("testing");
-    if(localStorage.getItem("s1 turns"))
-        localStorage.setItem("s1 turns",parseInt(localStorage.getItem("s1 turns"))+1);
-    else
-        localStorage.setItem("s1 turns",1);
-    
-    addToDisplay(localStorage.getItem("s1 turns"));
-   /* addToDisplay("starting");
-    defer();*/
+    setButtonsSaveButtons();
 }

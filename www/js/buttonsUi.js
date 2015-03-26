@@ -33,6 +33,7 @@ function setButtonsActions(){
     if('scavengable' in curLoc){
         enableButton(b3, "scavenge", scavengeRaped);
     }
+    enableButton(document.getElementById("b4"), "save/load", setButtonsSaveMenu);
 
     var i=0;
     var things=curLoc.things;
@@ -78,6 +79,40 @@ function setButtonsNavigate(){
             j++;
         }
     }
+}
+
+function setButtonsSave(){
+    disableAllButtons();
+    var test;
+    var i;
+    for(i=0; i<5;i++){
+        enableButton(document.getElementById(buttonNames[i]), "save "+(i+1), function(){storeSaveWebStorage(this.getAttribute("data-keyword")); setButtonsActions();});
+        document.getElementById(buttonNames[i]).setAttribute("data-keyword","s"+(i+1));
+    }
+    enableButton(document.getElementById("b15"), "back", setButtonsSaveMenu);
+}
+
+function setButtonsLoad(){
+    disableAllButtons();
+    var test;
+    var i;
+    for(i=0; i<5;i++){
+        if(localStorage.getItem("s"+(i+1)+" exists")){
+            enableButton(document.getElementById(buttonNames[i]), "load "+(i+1), function(){restoreSaveWebStorage(this.getAttribute("data-keyword")); setButtonsActions();});
+            document.getElementById(buttonNames[i]).setAttribute("data-keyword","s"+(i+1));
+        }
+    }
+    enableButton(document.getElementById("b15"), "back", setButtonsSaveMenu);
+}
+
+function setButtonsSaveMenu(){
+    disableAllButtons();
+
+    enableButton(document.getElementById("b1"), "save", setButtonsSave);
+
+    enableButton(document.getElementById("b2"), "load", setButtonsLoad);
+
+    enableButton(document.getElementById("b15"), "back", setButtonsActions);
 }
 
 function setButtonsCombat(){

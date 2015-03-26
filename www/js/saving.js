@@ -1,32 +1,59 @@
-function getListOfVariables(){
-    var keys=[];
-    for(var key in savableData){
-        ret.keys.push(savableData[key].name);
+function restoreSaveWebStorage(storage){
+    var i;
+    var value;
+    for(i=0; i<savableData.length; i++){
+        value=localStorage.getItem(storage+" "+savableData[i].name);
+        restoreValue(savableData[i], value);
     }
-    return keys;
+    addToDisplay("done");
+    //restoreOtherValues(storage);
 }
 
-function restoreSaveWebStorage(storage){
-    var keys=getListOfVariables();
+function storeSaveWebStorage(storage){
+    addToDisplay("starting");
+    var i;
     var value;
-    for(key in keys){
-        value=localStorage.getItem(storage+"|"+keys[key]);
-        restoreValue(keys[key], value);
+    for(i=0; i<savableData.length; i++){
+        value=getValue(savableData[i].name);
+        localStorage.setItem(storage+" "+savableData[i].name, value);
     }
+    localStorage.setItem(storage+" exists", "true");
+    addToDisplay("done");
+}
+
+function saveWebStorage(storage){
+    var keys=getListOfVariables();
 }
 
 function restoreValue(key,value){
-    var realValue=convertToValue(value);
-    findObject(key).value=realValue;
+    var realValue;
+    if(/list/.test(key.type)){
+        realValue=convertToListValue(key.type.replace(" list",""), value);
+    }
+    else{
+        realValue=convertToValue(key.type, value);
+    }
+    findObject(key.name).value=realValue;
 }
 
-function convertToValue(input){
-    var parts=input.split("|");
-    if(parts[0] == "boolean"){
-        return parts[1] == "true";
+function convertToValue(type, value){
+    if(type == "boolean"){
+        return value == "true";
     }
-    else if(parts[0] == "number")
-        return parseInt(parts[1]);
+    else if(type == "number")
+        return parseInt(value);
     else
-        return parts[1];
+        return value;
 }
+
+function convertToListValue(type, input){
+    var newList=[];
+    var value;
+    input=input.split(",");
+    for(var key in input){
+        value=convertToValue(type, input[key]);
+        newList.push(value);
+    }
+    return newList;
+}
+var compiled="compiled";
