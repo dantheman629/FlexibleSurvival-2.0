@@ -80,8 +80,9 @@
                 dataType: "text",
                 success : function (data) {
                     parseFile(data);
-            }
-        });
+                    addToDisplay("done");
+                }
+            });
         }
     </script>
     
@@ -212,12 +213,12 @@
             <button id="b2" onclick="goNorth()" type="button" class="actor">north</button>
             <button id="b3" onclick="goNorthEast()" type="button" class="actor">northeast</button>
             <button id="b4" onclick="sayHello()" type="button" class="actor">speak</button>
-            <button id="b5" onclick ="displaySmut()" type="button" class="actor">smut</button>
+            <button id="b5" onclick ="debugTest2()" type="button" class="actor">debug test2</button>
             <button id="b6" onclick="goWest()" type="button" class="actor">west</button>
             <button id="b7" onclick="describeCurrentLocation()" type="button" class="actor">current</button>
             <button id="b8" onclick="goEast()" type="button" class="actor">east</button>
             <button id="b9" onclick="clearDisplay()" type="button" class="actor">clear</button>
-            <button id="b10" onclick="debugTest()" type="button" class="actor">debug test</button>
+            <button id="b10" onclick="debugTest1()" type="button" class="actor">debug test1</button>
             <button id="b11" onclick="goSouthWest()" type="button" class="actor">southwest</button>
             <button id="b12" onclick="goSouth()" type="button" class="actor">south</button>
             <button id="b13" onclick="goSouthEast()" type="button" class="actor">southeast</button>

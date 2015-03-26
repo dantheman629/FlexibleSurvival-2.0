@@ -7,33 +7,41 @@ function parseFile(data){
     for(var i=0;i<lines.length;i++){
         line=getIndent(lines[i]);
         obj=getLineObject(line.value);
-        if(obj.type == "increase"){
-            addToDisplay(line.value);
-            addToDisplay(obj.name);
-            addToDisplay(obj.value);
+        if(obj.type == "otherwise" || obj.type == "otherwise if"){
+            indents[line.indent].onFalse=obj;
+            indents[line.indent]=obj;
         }
-        indents[line.indent-1].inside.push(obj);
-        indents[line.indent]=obj;
+        else{
+            indents[line.indent-1].inside.push(obj);
+            indents[line.indent]=obj;
+        }
     }
     addToDisplay("populating");
-    //populateObjects(indents[0].inside,0);
+    populateObjects(indents[0].inside,0);
+    addToDisplay("populated");
+    //addToDisplay(functions["testThing"]());
 }
 
 function populateObjects(lines,i){
     if(lines.length==i)
-        return;
+        return [];
     if(lines[i].type == "to say"){
-        addToDisplay("to say");
-        var value=lines[i].value;
-        value=value.replace(/^to say /, "");
-        value=value.replace(/:\s*$/, "");
-        addToDisplay(value)
+        var lineRet=populateObjects(lines[i].inside,0);
+        addToDisplay(lines[i].name);
+        functions[lines[i].name.toString()]=function (){evaluateLines(lineRet,0)};
+        var ret=populateObjects(lines, i+1);
+        return ret;
     }
-    populateObjects(lines,i+1);
+    var lineRet=populateObjects(lines,i+1);
+    lineRet.unshift(lines[i]);
+    return lineRet;
 }
 
 function evaluateLines(lines,i){
-    
+    if(lines.length == i)
+        return;
+    addToDisplay(lines[i].type);
+    evaluateLines(lines, i+1);
 }
 
 function getSay(line){
@@ -45,7 +53,7 @@ function getSay(line){
 function getToSay(line){
     line=line.replace(/^to say */, "");
     line=line.replace(/:.*/,"");
-    return {type:"to say", inside:[], statement:line};
+    return {type:"to say", inside:[], name:line};
 }
 
 function getLetBe(line){

@@ -98,6 +98,12 @@ var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thi
 aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
 
-function debugTest(){
+function debugTest1(){
     readFile("inform/Giraffe for FS.i7x");
+}
+function debugTest2(){
+    for(var key in functions){
+        addToDisplay("\n".charCodeAt(0));
+    }
+    addToDisplay(functions["giraffedesc\r"]());
 }
