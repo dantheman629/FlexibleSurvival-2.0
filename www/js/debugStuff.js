@@ -99,5 +99,5 @@ aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
 
 function debugTest(){
-    setButtonsSaveButtons();
+    readFile("inform/Giraffe for FS.i7x");
 }

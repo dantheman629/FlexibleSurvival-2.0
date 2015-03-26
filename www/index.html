@@ -67,35 +67,22 @@
     <script src="js/explore.js" type="text/javascript"></script>
     <script src="js/displayUi.js" type="text/javascript"></script>
     <script src="js/saving.js" type="text/javascript"></script>
+    <script src="js/parseFile.js" type="text/javascript"></script>
     <script src="js/initialize.js" type="text/javascript"></script>
     <script src="js/debugStuff.js" type="text/javascript"></script>
     
     <script>
-
-/*function defer() {
-    if (window.jQuery) {  
-        addToDisplay("yes");
-    } else {
-        addToDisplay("no");
-    }
-}
-        
-        function testIO(input){
-            addToDisplay(input);
-        }*/
         
 
-    /*$(document).ready(function() {
-    $("#b5").click(function() {
-        $.ajax({
-            url : "test.txt",
-            dataType: "text",
-            success : function (data) {
-                testIO(data);
+        function readFile(path) {
+            $.ajax({
+                url : path,
+                dataType: "text",
+                success : function (data) {
+                    parseFile(data);
             }
         });
-    });
-});/
+        }
     </script>
     
     <style>
