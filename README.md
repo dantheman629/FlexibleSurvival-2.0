@@ -1,1 +1,1 @@
-the only files right now need to run are wwww/index.html and www/testpic.jpg.  put those two in the same directory and run the html to run it.  The code right now is a mess, so don't try to read it yet.
+the only files right now need to run are in the www file.  If you want to run the game download the project and double click on www/index.html to run it.  The main branch is probably super buggy, stick with the realeases to grab the project when i was at a phase where i feel like i ironed out most of the bugs.  Download the main project if you want the most up to date stuff.
