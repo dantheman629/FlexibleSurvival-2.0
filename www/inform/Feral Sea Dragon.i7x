@@ -1,6 +1,4 @@
-Version 6 of Feral Sea Dragon by Tunalord Sefont begins here.
-[Version 6 - Dragonpalooza 2: Housekeeping, Vore, and Victory]
-"Adds a Feral Sea Dragon to Flexible Survival's Wandering Monsters table"
+
 
 twistfsdfeedmemory is a truth state that varies. twistfsdfeedmemory is usually false.
 MFSDUBM is a truth state that varies. MFSDUBM is usually false.
