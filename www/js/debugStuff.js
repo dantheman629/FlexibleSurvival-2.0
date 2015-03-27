@@ -4,8 +4,6 @@ data.testText1={type:"text", value:"[one of]Daniel[or]Nuku[or]stripes[at purely 
 
 data.testText2={type:"text", value:"[one of]Daniel[or]Nuku[or]stripes[at purely random]"};
 
-data.nogiraffesex={type:"number", value:0};
-
 data.simple={type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:false, others:["testOp1", "testOp"]}};
 
 data.testE1={type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}};
@@ -108,8 +106,9 @@ player.feats.value.push("Submissive");
 functions["mimpregchance"]={type:"function", value:function(onDone){onDone();}};
 
 function debugTest1(){
-    addToDisplay("starting");
-    functions["beatthegiraffe"].value(function(){addToDisplay("");addToDisplay("All done.");setButtonsTravel()});
+    //functions["beatthegiraffe"].value(function(){addToDisplay("");addToDisplay("All done.");setButtonsTravel()});
+    var row=tables[currentTable].rows[0];
+    evaluateStatement(row.cock.value.inside,0, function (){addToDisplay("");addToDisplay("done");});
 }
 
 function testfunc(onDone){
@@ -121,5 +120,5 @@ functions["testfunc"]={type:"function", value:testfunc};
 
 function debugTest2(){
     addToDisplay("starting");
-    readFile("inform/Giraffe for FS.i7x");
+    readFile("inform/Feral Sea Dragon.i7x");
 }

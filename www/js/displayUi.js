@@ -17,7 +17,7 @@ function updateRemaining(){
 
 function addToDisplay(text) {
     var display = document.getElementById("display");
-    curdisplay=curdisplay+text+"<hr />"; 
+    curdisplay=curdisplay+text+"<br /><br />"; 
     display.innerHTML=curdisplay; 
     display.scrollTop = display.scrollHeight;
 }

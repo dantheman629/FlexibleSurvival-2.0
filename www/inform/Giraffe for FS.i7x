@@ -2,7 +2,7 @@ when play begins:
 	add { "Giraffe" } to infections of hermaphrodite;
 	add { "Giraffe" } to infections of furry;
 
-nogiraffesex is a number that varies.
+nogiraffesex is a number that varies. nogiraffesex is usually 0.
 
 to say losetogiraffe:
 	now nogiraffesex is 0;

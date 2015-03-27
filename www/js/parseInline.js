@@ -17,7 +17,10 @@ function parseInput(input){
                 if(inlines[key].test(newkey.value)){
                     newkey.stype=key;
                     foundMatch=true;
-                    newkey.value=newkey.value.replace(inlines[key], "");
+                    if(key!="at")
+                        newkey.value=newkey.value.replace(inlines[key], "");
+                    else
+                        newkey.value=newkey.value.replace("at ", "");
                 }
             }
                 if(!foundMatch)
@@ -53,10 +56,10 @@ function getValue(input){
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
         if(found == 'undefined')
-            addToDisplay("ERROR: Unkown object "+input);
+            error("ERROR: Unkown object "+input);
     }
     if(found.value == 'undefined')
-        addToDisplay("ERROR: Unkown value "+input);
+        error("ERROR: Unkown value "+input);
     return found.value;
 }
 
@@ -70,7 +73,7 @@ function findObject(input){
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
         if(found == 'undefined')
-            addToDisplay("ERROR: Unkown object "+input);
+            error("ERROR: Unkown object "+input);
     }
     return found;
 }

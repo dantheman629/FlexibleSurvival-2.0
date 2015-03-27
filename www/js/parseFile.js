@@ -19,17 +19,21 @@ function parseFile(data){
     }
     addToDisplay("populating");
     evaluateLines(indents[0].inside,0,function(){});
-    addToDisplay("populated");
+    return;
     //addToDisplay(functions["testThing"]());
 }
 function evaluateLines(lines, i, onDone){
     var continuef=function(){evaluateLines(lines, i+1, onDone);};
-    if(lines.length == i){
+    if(lines.length <= i){
         onDone();
         return;
     }
     if(lines[i].type == "to say"){
         functions[lines[i].name.replace("\r", "")]={type:"function", value:(function (onDone){evaluateLines(lines[i].inside,0,onDone);})};
+        continuef();
+    }
+    else if(lines[i].type == "when"){
+        playBegins=playBegins.concat(lines[i].inside);
         continuef();
     }
     else if(lines[i].type == "say"){
@@ -65,6 +69,9 @@ function evaluateLines(lines, i, onDone){
             value=parseInput(value);
             nowIs(lines[i].name, value);
         }
+        else if(lines[i].value == "true" || lines[i].value == "false"){
+            nowIs(lines[i].name, lines[i].value == "true");
+        }
         else{
             var value=getValue(lines[i].value);
             nowIs(lines[i].name, value);
@@ -80,6 +87,38 @@ function evaluateLines(lines, i, onDone){
     else if(lines[i].type == "increase"){
         var curObj=findObject(lines[i].name);
         curObj.value=parseInt(curObj.value)+parseInt(lines[i].value);
+        continuef();
+    }
+    else if(lines[i].type == "is a"){
+        evaluateIsA(lines[i].lines, 0);
+        continuef();
+    }
+    else if(lines[i].type == "choose blank"){
+        var newRow={};
+        currentTable=lines[i].table;
+        var types=tables[currentTable].types;
+        var value;
+        var type;
+        for(var key in types){
+            value={};
+            value.type="";
+            type=types[key];
+            if(type=="number"){
+                value.value=0;
+                value.type=type;
+            }
+            else if(type=="text"){
+                value.value=parseInput("");
+                value.type=type;
+            }
+            else if(type=="option"){
+                type.value=false;
+                type.type="option";
+                type.others=[];
+            }
+            newRow[key.replace("\r","")]=value;
+        }
+        tables[currentTable].rows.push(newRow);
         continuef();
     }
     else
@@ -108,19 +147,19 @@ function playerConsents(onTrue, onFalse){
 }
     
 function getSay(line){
-    line=line.replace(/^say *"/, "");
-    line=line.replace(/".*/,"");
+    line=line.replace(/^\s*say *"/i, "");
+    line=line.replace(/";\s*.*/i,"");
     return {type:"say", statement:(parseInput(line)), newline:(/\.$|\?$|\!$/.test(line))};
 }
 
 function getToSay(line){
-    line=line.replace(/^to say */, "");
+    line=line.replace(/^\s*to say */i, "");
     line=line.replace(/:.*/,"");
     return {type:"to say", inside:[], name:line};
 }
     
 function getLetBe(line){
-    line=line.replace(/^let */, "");
+    line=line.replace(/^\s*let *i/, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" be ");
     var name=parts.shift();
@@ -129,7 +168,7 @@ function getLetBe(line){
 }
 
 function getNowIs(line){
-    line=line.replace(/^now */, "");
+    line=line.replace(/^\s*now */i, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" is ");
     var name=parts.shift();
@@ -138,20 +177,20 @@ function getNowIs(line){
 }
 
 function getNowIsNot(line){
-    line=line.replace(/^now */, "");
+    line=line.replace(/^\s*now */i, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" is not ");
     return {type:"now is not", name:(parts.shift()), value:(parts.join(" is not "))};
 }
 
 function getIf(line){
-    line=line.replace(/^if */, "");
+    line=line.replace(/^\s*if */i, "");
     line=line.replace(/\:.*$/,"");
     return {type:"if", inside:[], onFalse:{type:"otherwise", inside:[]}, condition:line};
 }
 
 function getOtherwiseIf(line){
-    line=line.replace(/^otherwise if */, "");
+    line=line.replace(/^\s*otherwise if */i, "");
     line=line.replace(/:.*/,"");
     return {type:"otherwise if", inside:[], onFalse:{type:"otherwise", inside:[]}, condition:line};
 }
@@ -161,60 +200,113 @@ function getOtherwise(line){
 }
 
 function getIfLine(line){
-    line=line.replace(/^if */, "");
+    line=line.replace(/^\s*if */i, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(", ");
     return {type:"if", onFalse:{type:"otherwise", inside:[]}, condition:(parts.shift()), inside:[getLineObject(parts.join(", "))]};
 }
 
+function getIsA(line){
+    var lines=line.split(".");
+    for(var i=0; i<lines.length; i++)
+        lines[i]=lines[i].trim();
+    return {type:"is a", lines:lines};
+}
+
 function getIncrease(line){
-    line=line.replace(/^increase */, "");
+    line=line.replace(/^\s*increase */i, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" by ");
     return {type:"increase", name:(parts.shift()), value:(parts.join(" by "))};
 }
 
+function evaluateIsA(lines, i){
+    if(lines.length <= i)
+        return;
+    if(/ is a /.test(lines[i])){
+        var line=lines[i].trim();
+        var varies=/ that varies/.test(line);
+        line=line.replace(" that varies", "");
+        line=line.split(" is a ");
+        var newVal={};
+        if(line[1] == "number"){
+            newVal.type="number";
+            newVal.value=0;
+        }
+        else if(line[1] == "truth state"){
+            newVal.type="option";
+            newVal.value=false;
+            newVal.others=[];
+        }
+        data[line[0]]=newVal;
+        if(varies)
+            savableData.push({name:line[0], type:newVal.type});
+    }
+    else if(/ is usually/.test(lines[i])){
+        var line=lines[i].trim();
+        line=line.split(" is usually ");
+        var obj=findObject(line[0].trim());
+        if(obj.type == "number")
+            obj.value=parseInt(line[1].trim());
+        else if(obj.type == "option")
+            obj.value=line[1].value == "true";
+        else if(obj.type == "text")
+            obj.value=parseInput(line[1].trim().replace(/^"/,"").replace(/"$/,""));
+    }
+    evaluateIsA(lines, i+1);
+}
+
+function getWhen(line){
+    return {type:"when", inside:[]};
+}
+
+function getChooseBlank(line){
+    line=line.replace("Choose a blank row from Table of ", "");
+    line=line.replace(/;.*$/, "");
+    return {type:"choose blank", table:line};
+}
+
 function getLineObject(line){
-    var type="";
+    var type="empty";
     line=line.replace(/\r/g, "");
-    if(/^to say .*:/.test(line))
+    if(/^\s*to say .*:/i.test(line.toLowerCase()))
         return getToSay(line);
-    else if(/^say/.test(line))
+    else if(/^\s*say/i.test(line.toLowerCase()))
         return getSay(line);
-    else if(/^let .* be/.test(line))
+    else if(/^\s*let .* be/i.test(line.toLowerCase()))
         return getLetBe(line);
-    else if(/^now .* is(?! not)/.test(line))
+    else if(/^\s*now .* is(?! not)/i.test(line.toLowerCase()))
         return getNowIs(line);
-    else if(/^now .* is not/.test(line))
+    else if(/^\s*now .* is not/i.test(line.toLowerCase()))
         return getNowIsNot(line);
-    else if(/^if .*;/.test(line))
+    else if(/^\s*if .*;/i.test(line.toLowerCase()))
         return getIfLine(line);
-    else if(/^if .*:/.test(line))
+    else if(/^\s*if .*:/i.test(line.toLowerCase()))
         return getIf(line);
-    else if(/^otherwise if .*:/.test(line))
+    else if(/^\s*otherwise if .*:/i.test(line.toLowerCase()))
         return getOtherwiseIf(line);
-    else if(/^otherwise:/.test(line))
+    else if(/^\s*otherwise:/i.test(line.toLowerCase()))
         return getOtherwise(line);
-    else if(/^increase .* by/.test(line))
+    else if(/^\s*increase .* by/i.test(line.toLowerCase()))
         return getIncrease(line);
-    else if(/^\s*$/.test(line))
+    else if(/^\s*$/.test(line.toLowerCase()))
         type="empty";
-    else if(/^when /.test(line))
-        type="when";
-    else if(/^When /.test(line))
-        type="when";
-    else if(/^blank out the /.test(line))
+    else if(line.toLowerCase() == "when play begins:")
+        return getWhen();
+    else if(/^\s*blank out the /i.test(line.toLowerCase()))
         type="blank out";
-    else if(/^Choose a .* from/.test(line))
-        type="choose";
+    else if(/^\s*Choose a blank row from Table of /i.test(line))
+        return getChooseBlank(line);
     else if(/^Section .*-/.test(line))
         type="section";
     else if(/^add .* to .* of/.test(line))
         type="add";
-    else if(/^.* is a .* that varies/.test(line))
-        type="is a";
-    else
+    else if(/^.* is a .* that varies/.test(line.toLowerCase()))
+        return getIsA(line);
+    else{
+        addToDisplay(line);
         type="other";
+    }
     return {type:type, inside:[], value:line};
 }
 

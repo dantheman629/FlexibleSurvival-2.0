@@ -9,7 +9,19 @@ function getRandom(a,b){
     return r;
 }
 
+function error(output){
+    addToDisplay("");
+    addToDisplay("-------------------");
+    addToDisplay(output);
+    addToDisplay("-------------------");
+}
+
 function nowIs(name, value){
+    if(/ entry/.test(name)){
+        name=name.replace(" entry", "");
+        tables[currentTable].rows[tables[currentTable].rows.length-1][name].value=value;
+        return;
+    }
     var obj=findObject(name);
     if(obj.type == "text"){
         obj.value=value;
@@ -17,6 +29,8 @@ function nowIs(name, value){
     else if(obj.type == "number"){
         obj.value=parseInt(value);
     }
+    else if(obj.type == "option")
+        obj.value=(value == "true" ||value === true);
     else{
         obj[value].value=true;
         var others=obj[value].others;

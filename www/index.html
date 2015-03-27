@@ -72,15 +72,14 @@
     <script src="js/debugStuff.js" type="text/javascript"></script>
     
     <script>
-        
-
         function readFile(path) {
             $.ajax({
                 url : path,
                 dataType: "text",
                 success : function (data) {
                     parseFile(data);
-                    addToDisplay("done");
+                    addToDisplay("starting loading");
+                    evaluateLines(playBegins,0,function(){addToDisplay("Done loading");});
                 }
             });
         }
