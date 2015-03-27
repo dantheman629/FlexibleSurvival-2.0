@@ -1,6 +1,12 @@
 data.simpletest={type:"text", value:"hi"};
 
-data.simple={type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:true, others:["testOp1", "testOp"]}};
+data.testText1={type:"text", value:"[one of]Daniel[or]Nuku[or]stripes[at purely random]"};
+
+data.testText2={type:"text", value:"[one of]Daniel[or]Nuku[or]stripes[at purely random]"};
+
+data.nogiraffesex={type:"number", value:0};
+
+data.simple={type:"thing", test1:{type:"text", value:"hi"}, test2:{type:"number", value:42}, testOp:{type:"option", value:false, others:["testOp1", "testOp2"]}, testOp1:{type:"option", value:true, others:["testOp", "testOp2"]}, testOp2:{type:"option", value:false, others:["testOp1", "testOp"]}};
 
 data.testE1={type:"event", event:testEvent1, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}};
 
@@ -12,7 +18,6 @@ data.huskyBitch={type:"monster", name:"husky bitch", description:function (){add
 
 data.testBoolArray={type:"boolean list", value:[false, false, false]};
 savableData.push({name:"testBoolArray", type:"boolean list"});
-data.testText={type:"text", value:"hello there"};
 savableData.push({name:"testText", type:"text"});
 
 function testEvent1(){
@@ -53,7 +58,7 @@ var entrance={type:"location", name:'entrance', description:'whole lotta nothing
 
 var south={type:"location", name:'south', description:'whole lotta nothing but in the south. should be able to explore', explorable:true, north:"entrance", northwest:"west", west:"southwest", east:"southeast", northeast:"east", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
 
-var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[], events:[], monsters:[]};
+var southeast={type:"location", name:'southeast', description:'whole lotta nothing but in the southeast', north:"east", northwest:"entrance", west:"south", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
 
 var east={type:"location", name:'east', description:'whole lotta nothing but in the east', north:"northeast", northwest:"north", west:"entrance", southwest:"south", south:"southeast", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
 
@@ -98,12 +103,23 @@ var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thi
 aThing.actions.talk=talk;
 addThing("entrance", "thing", aThing);
 
+player.feats.value.push("Submissive");
+
+functions["mimpregchance"]={type:"function", value:function(onDone){onDone();}};
+
 function debugTest1(){
-    readFile("inform/Giraffe for FS.i7x");
+    addToDisplay("starting");
+    functions["beatthegiraffe"].value(function(){addToDisplay("");addToDisplay("All done.");setButtonsTravel()});
 }
+
+function testfunc(onDone){
+    appendToDisplay("This is the function you ran");
+    onDone();
+}
+
+functions["testfunc"]={type:"function", value:testfunc};
+
 function debugTest2(){
-    for(var key in functions){
-        addToDisplay("\n".charCodeAt(0));
-    }
-    addToDisplay(functions["giraffedesc\r"]());
+    addToDisplay("starting");
+    readFile("inform/Giraffe for FS.i7x");
 }

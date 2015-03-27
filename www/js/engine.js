@@ -11,8 +11,11 @@ function getRandom(a,b){
 
 function nowIs(name, value){
     var obj=findObject(name);
-    if(obj.type == "text" || obj.type == "number"){
+    if(obj.type == "text"){
         obj.value=value;
+    }
+    else if(obj.type == "number"){
+        obj.value=parseInt(value);
     }
     else{
         obj[value].value=true;

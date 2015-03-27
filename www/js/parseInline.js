@@ -5,7 +5,6 @@ function testSplit(test){
 var test="hello";
 
 function parseInput(input){
-    addToDisplay(input);
     var res = input.split(/\[|\]/);
     var items=[];
     var newkey;
@@ -15,7 +14,6 @@ function parseInput(input){
             newkey={type:"special", value:res[key]};
             var foundMatch=false;
             for(key in inlines){
-                addToDisplay(newkey.value);
                 if(inlines[key].test(newkey.value)){
                     newkey.stype=key;
                     foundMatch=true;
@@ -24,7 +22,6 @@ function parseInput(input){
             }
                 if(!foundMatch)
                     newkey.stype="other";
-            addToDisplay(newkey.stype);
             isspecial=false;
         }
         else{
@@ -34,8 +31,9 @@ function parseInput(input){
         if(newkey.value != "" || newkey.type == "special")
             items.push(newkey);
     }
-    addToDisplay("test");
-    return parseStatements(items);
+    var statement=parseStatements(items);
+    statement.original=input;
+    return {inside:statement.inside, original:input};
 }
 
 function getValue(input){
@@ -54,16 +52,25 @@ function getValue(input){
     var found=data;
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
+        if(found == 'undefined')
+            addToDisplay("ERROR: Unkown object "+input);
     }
+    if(found.value == 'undefined')
+        addToDisplay("ERROR: Unkown value "+input);
     return found.value;
 }
 
 function findObject(input){
+    if(input in functions){
+        return functions[input];
+    }
     var lookups=input.split(/ of /);
     var i;
     var found=data;
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
+        if(found == 'undefined')
+            addToDisplay("ERROR: Unkown object "+input);
     }
     return found;
 }
@@ -72,76 +79,85 @@ function evaluateIf(ifs){
     if(ifs.stype == "otherwise"){
         return ifs.onAlways;
     }
-    if(parseParenInput(ifs.value) == "true"){
+    else if(parseParenInput(ifs.value)){
         return ifs.onTrue;
     }
-    else{
+    else
         return evaluateIf(ifs.onFalse);
-    }
 }
 
-function evaluateStatement(statement, i){
-    if(statement.length == i)
-        return "";
-    var next=statement[i];
-    var ret=evaluateStatement(statement, i+1);
-    if(next.type == "string"){
-        return next.value+ret;
+function evaluateStatement(statement, i, onDone){
+    if(statement.length == i){
+        onDone();
     }
-    if(next.stype == "if"){
-        var ifeval=evaluateIf(next);
-        ifeval=evaluateStatement(ifeval, 0);
-        return ifeval+ret;
-    }
-    if(next.stype == "oneOf"){
-        if(next.pickType == "random"){
-            onePick=next.options[getRandom(0,next.options.length-1)].inside;
+    else{
+        var next=statement[i];
+        if(next.type == "string"){
+            appendToDisplay(next.value);
+            evaluateStatement(statement, i+1, onDone);
         }
-        else if(next.pickType == "sticky random"){
-            onePick=next.options[otherwiseStates[next.id]].inside;
+        else if(next.stype == "if"){
+            var ifEval=evaluateIf(next);
+            evaluateStatement(ifEval, 0, function(){evaluateStatement(statement, i+1, onDone);});
         }
-        else if(next.pickType == "decreasing"){
-            var r=getRandom(1,((next.options.length+1)*(next.options.length))/2);
-            var i;
-            var pick=-1;
-            for(i=next.options.length; i>0&&pick==-1; i--){
-                if(r<=i)
-                    pick=next.options.length-i;
-                r=r-next.options.length;
+        else if(next.stype == "oneOf"){
+            var onePick;
+            if(next.pickType == "random"){
+                onePick=next.options[getRandom(0,next.options.length-1)].inside;
             }
-            onePick=next.options[pick].inside;
-        }
-        else if(next.pickType == "stopping"){
-            var pick=otherwiseStates[next.id];
-            onePick=next.options[pick].inside;
-            if(pick<next.options.length-1){
-                otherwiseStates[next.id]=pick+1;
+            else if(next.pickType == "sticky random"){
+                onePick=next.options[otherwiseStates[next.id]].inside;
             }
-        }
-        else if(next.pickType == "purely random"){
-            if(otherwiseStates[next.id].free.length==0){
-                otherwiseStates[next.id].free=otherwiseStates[next.id].used;
-                otherwiseStates[next.id].used=[];
+            else if(next.pickType == "decreasing"){
+                var r=getRandom(1,((next.options.length+1)*(next.options.length))/2);
+                var j;
+                var pick=-1;
+                for(j=next.options.length; j>0&&pick==-1; j--){
+                    if(r<=i)
+                        pick=next.options.length-j;
+                    r=r-next.options.length;
+                }
+                onePick=next.options[pick].inside;
             }
-            var r=getRandom(0, otherwiseStates[next.id].free.length-1);
-            var i=otherwiseStates[next.id].free[r];
-            onePick=next.options[i].inside;
-            otherwiseStates[next.id].free.splice(r,1);
-            otherwiseStates[next.id].used.push(i);
+            else if(next.pickType == "stopping"){
+                var pick=otherwiseStates[next.id];
+                onePick=next.options[pick].inside;
+                if(pick<next.options.length-1){
+                    otherwiseStates[next.id]=pick+1;
+                }
+            }
+            else if(next.pickType == "purely random"){
+                if(otherwiseStates[next.id].free.length==0){
+                    otherwiseStates[next.id].free=otherwiseStates[next.id].used;
+                    otherwiseStates[next.id].used=[];
+                }
+                var r=getRandom(0, otherwiseStates[next.id].free.length-1);
+                var j=otherwiseStates[next.id].free[r];
+                onePick=next.options[j].inside;
+                otherwiseStates[next.id].free.splice(r,1);
+                otherwiseStates[next.id].used.push(j);
+            }
+            evaluateStatement(onePick,0, function(){evaluateStatement(statement, i+1, onDone)});
         }
-        onePick=evaluateStatement(onePick,0);
-        return onePick+ret;
+        else if(next.stype == "other"){
+            var ret=findObject(next.value);
+            if(ret.type == "number"){
+                appendToDisplay(ret.value);
+                evaluateStatement(statement, i+1, onDone);
+            }
+            else if(ret.type == "text"){
+                evaluateStatement(ret.value.inside,0, function(){evaluateStatement(statement, i+1, onDone)});
+            }
+            else if(ret.type == "function"){
+                ret.value(function(){evaluateStatement(statement, i+1, onDone)});
+            }
+            else
+                addToDisplay("ERROR");
+        }
     }
-    if(next.stype == "other"){
-        var ret=evaluateStatement(statement, i+1);
-        return getValue(next.value)+ret;
-    }
-    addToDisplay("ERROR");
-    return "";
 }
 
 function parseStatements(toParse){
-    addToDisplay(toParse.length);
     if(toParse.length==0){
         return {type:"special", stype:"actions", inside:[]};
     }

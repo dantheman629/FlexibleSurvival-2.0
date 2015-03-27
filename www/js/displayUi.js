@@ -22,8 +22,15 @@ function addToDisplay(text) {
     display.scrollTop = display.scrollHeight;
 }
 
+function appendToDisplay(text) {
+    var display = document.getElementById("display");
+    curdisplay=curdisplay+text; 
+    display.innerHTML=curdisplay; 
+    display.scrollTop = display.scrollHeight;
+}
+
 function displayHealth(){
-    return "Health: "+data.player.hp+"/"+data.player.maxHp;
+    return "Health: "+data.player.hp.value+"/"+data.player.maxHp.value;
 }
 
 function displayEnemyHealth(){

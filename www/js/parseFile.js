@@ -1,4 +1,5 @@
 function parseFile(data){
+    addToDisplay("parsing");
     var lines=data.split("\n");
     var line;
     var lineObj;
@@ -17,37 +18,99 @@ function parseFile(data){
         }
     }
     addToDisplay("populating");
-    populateObjects(indents[0].inside,0);
+    evaluateLines(indents[0].inside,0,function(){});
     addToDisplay("populated");
     //addToDisplay(functions["testThing"]());
 }
-
-function populateObjects(lines,i){
-    if(lines.length==i)
-        return [];
-    if(lines[i].type == "to say"){
-        var lineRet=populateObjects(lines[i].inside,0);
-        addToDisplay(lines[i].name);
-        functions[lines[i].name.toString()]=function (){evaluateLines(lineRet,0)};
-        var ret=populateObjects(lines, i+1);
-        return ret;
-    }
-    var lineRet=populateObjects(lines,i+1);
-    lineRet.unshift(lines[i]);
-    return lineRet;
-}
-
-function evaluateLines(lines,i){
-    if(lines.length == i)
+function evaluateLines(lines, i, onDone){
+    var continuef=function(){evaluateLines(lines, i+1, onDone);};
+    if(lines.length == i){
+        onDone();
         return;
-    addToDisplay(lines[i].type);
-    evaluateLines(lines, i+1);
+    }
+    if(lines[i].type == "to say"){
+        functions[lines[i].name.replace("\r", "")]={type:"function", value:(function (onDone){evaluateLines(lines[i].inside,0,onDone);})};
+        continuef();
+    }
+    else if(lines[i].type == "say"){
+        evaluateStatement(lines[i].statement.inside,0,function(){ if(lines[i].newline) addToDisplay(""); continuef();});
+    }
+    else if(lines[i].type == "let"){
+        var newVal={};
+        if(!isNaN(lines[i].value)){
+            newVal.value=parseInt(lines[i].value);
+            newVal.type="number";
+        }
+        else if(/ *"/.test(lines[i].value)){
+            var value=lines[i].value.replace(/ *"/,"");
+            value=value.replace(/".*$/,"");
+            value=parseInput(value);
+            newVal.value=value;
+            newVal.type="text";
+        }
+        else{
+            lines[i].value=getValue(lines[i].value);
+            lines[i].type=findObject(lines[i].value).type;
+        }
+        data[lines[i].name]=newVal;
+        continuef();
+    }
+    else if(lines[i].type == "now is"){
+        if(!isNaN(lines[i].value)){
+            nowIs(lines[i].name, lines[i].value);
+        }
+        else if(/ *"/.test(lines[i].value)){
+            var value=lines[i].value.replace(/ *"/,"");
+            value=value.replace(/".*$/,"");
+            value=parseInput(value);
+            nowIs(lines[i].name, value);
+        }
+        else{
+            var value=getValue(lines[i].value);
+            nowIs(lines[i].name, value);
+        }
+        continuef();
+    }
+    else if(lines[i].type == "if line"){
+        evalFileIf(lines[i], continuef);
+    }
+    else if(lines[i].type == "if"){
+        evalFileIf(lines[i], continuef);
+    }
+    else if(lines[i].type == "increase"){
+        var curObj=findObject(lines[i].name);
+        curObj.value=parseInt(curObj.value)+parseInt(lines[i].value);
+        continuef();
+    }
+    else
+        continuef();
 }
 
+function evalFileIf(ifState, onDone){
+    if(ifState.type == "otherwise")
+        evaluateLines(ifState.inside,0,onDone);
+    else if(ifState.condition == "the player consents")
+        playerConsents(function(){evaluateLines(ifState.inside,0,onDone);}, function(){evalFileIf(ifState.onFalse, onDone);});
+    else{
+        var result=parseParenInput(ifState.condition);
+        if(result){
+            evaluateLines(ifState.inside,0,onDone);
+        }
+        else{
+            evalFileIf(ifState.onFalse, onDone);
+        }
+    }
+}
+
+function playerConsents(onTrue, onFalse){
+    addToDisplay("Do you want to?");
+    setButtonsConsent(onTrue, onFalse);
+}
+    
 function getSay(line){
     line=line.replace(/^say *"/, "");
     line=line.replace(/".*/,"");
-    return {type:"say", statement:line};
+    return {type:"say", statement:(parseInput(line)), newline:(/\.$|\?$|\!$/.test(line))};
 }
 
 function getToSay(line){
@@ -55,19 +118,23 @@ function getToSay(line){
     line=line.replace(/:.*/,"");
     return {type:"to say", inside:[], name:line};
 }
-
+    
 function getLetBe(line){
     line=line.replace(/^let */, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" be ");
-    return {type:"let", name:(parts.shift()), value:(parts.join(" be "))};
+    var name=parts.shift();
+    var value=parts.join(" be ");
+    return {type:"let", name:name, value:value};
 }
 
 function getNowIs(line){
     line=line.replace(/^now */, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" is ");
-    return {type:"now is", name:(parts.shift()), value:(parts.join(" is "))};
+    var name=parts.shift();
+    var value=parts.join(" is ");
+    return {type:"now is", name:(name), value:value};
 }
 
 function getNowIsNot(line){
@@ -79,14 +146,14 @@ function getNowIsNot(line){
 
 function getIf(line){
     line=line.replace(/^if */, "");
-    line=line.replace(/:.*/,"");
-    return {type:"if", inside:[], condition:line};
+    line=line.replace(/\:.*$/,"");
+    return {type:"if", inside:[], onFalse:{type:"otherwise", inside:[]}, condition:line};
 }
 
 function getOtherwiseIf(line){
     line=line.replace(/^otherwise if */, "");
     line=line.replace(/:.*/,"");
-    return {type:"otherwise if", inside:[], condition:line};
+    return {type:"otherwise if", inside:[], onFalse:{type:"otherwise", inside:[]}, condition:line};
 }
 
 function getOtherwise(line){
@@ -97,7 +164,7 @@ function getIfLine(line){
     line=line.replace(/^if */, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(", ");
-    return {type:"if line", condition:(parts.shift()), onTrue:(getLineObject(parts.join(", ")))};
+    return {type:"if", onFalse:{type:"otherwise", inside:[]}, condition:(parts.shift()), inside:[getLineObject(parts.join(", "))]};
 }
 
 function getIncrease(line){
@@ -109,6 +176,7 @@ function getIncrease(line){
 
 function getLineObject(line){
     var type="";
+    line=line.replace(/\r/g, "");
     if(/^to say .*:/.test(line))
         return getToSay(line);
     else if(/^say/.test(line))
@@ -155,3 +223,4 @@ function getIndent(line){
     var value=line.replace(/\t*/, "");
     return {indent:indent, value:value};
 }
+    

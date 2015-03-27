@@ -1,5 +1,5 @@
 function parseParenInput(input){
-    var res=input.split(/(?=\()|\)/)
+    var res=input.split(/(?=\()|\)/);
     var i;
     for(i=1; i<res.length;i++){
         if(!(/^\(/.test(res[i]))){
@@ -10,13 +10,13 @@ function parseParenInput(input){
     for(i=0; i<res.length; i++){
         if(/^\(/.test(res[i])){
             ret.push("(");
-            var rest=res[i].replace("(","")
+            var rest=res[i].replace("(","");
             if(/\w/.test(rest))
                 ret.push(rest);
         }
         else if(/^\)/.test(res[i])){
             ret.push(")");
-            var rest=res[i].replace(")","")
+            var rest=res[i].replace(")","");
             if(/\w/.test(rest))
                 ret.push(rest);
         }
@@ -32,16 +32,17 @@ function parseParenInput(input){
 function parseSimpleExpression(exp){
     var res=exp.split(/(?=and |or )/);
     var ret=[];
+    var i;
     for(i=0; i<res.length; i++){
         if(/^and /.test(res[i])){
             ret.push("and");
-            var rest=res[i].replace("and ","")
+            var rest=res[i].replace("and ","");
             if(/\w/.test(rest))
                 ret.push(rest.trim());
         }
         else if(/^or /.test(res[i])){
             ret.push("or");
-            var rest=res[i].replace("or ","")
+            var rest=res[i].replace("or ","");
             if(/\w/.test(rest))
                 ret.push(rest.trim());
         }
@@ -118,12 +119,12 @@ function evaluateExpression(exp){
     for(i=0; i<exp.length; i++){
         total=total+exp[i];
     }
-    return parseSimpleExpression(total).toString();
+    return parseSimpleExpression(total);
 }
 
 function parseParen(toParse){
     if(toParse.length==0){
-        return {type:"expression", inside:[]}
+        return {type:"expression", inside:[]};
     }
     var next=toParse.shift();
     if(next=="("){
@@ -144,15 +145,34 @@ function parseParen(toParse){
     }
 }
 
+function listedIn(input){
+    input[0]=input[0].trim();
+    input[1]=input[1].trim();
+    input[0]=input[0].replace(/^"/,"");
+    input[0]=input[0].replace(/"$/,"");
+    return -1 != getValue(input[1]).indexOf(input[0]);
+}
+
+function randomChance(input){
+    var strings=input.split(" in ");
+    strings[0]=parseInt(getValue(strings[0].trim()));
+    strings[1]=parseInt(getValue(strings[1].trim()));
+    var rand=getRandom(1, strings[1]);
+    return strings[0] >= rand;
+}
+
 function evaluateBoolean(statement){
     if(statement == "true")
         return true;
+    if(/ is listed in /.test(statement)){
+        return listedIn(statement.split(" is listed in "));
+    }
     if(statement == "false")
         return false;
-    if(/\<(?!=)/.test(statement)){
+    if(/<(?!=)/.test(statement)){
         return lessThan(statement.split("<"));
     }
-    if(/\<=/.test(statement)){
+    if(/<=/.test(statement)){
         return lessThanEqualTo(statement.split("<="));
     }
     if(/\>(?!=)/.test(statement)){
@@ -166,6 +186,9 @@ function evaluateBoolean(statement){
     }
     if(/ is /.test(statement)){
         return is(statement.split(" is "));
+    }
+    if(/a random chance of/.test(statement)){
+        return randomChance(statement.replace("a random chance of ", "").replace(" succeeds", ""));
     }
 }
 

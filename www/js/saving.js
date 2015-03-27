@@ -6,6 +6,7 @@ function restoreSaveWebStorage(storage){
         restoreValue(savableData[i], value);
     }
     addToDisplay("done");
+    updateAll();
     //restoreOtherValues(storage);
 }
 

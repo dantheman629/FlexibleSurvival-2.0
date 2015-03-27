@@ -11,7 +11,6 @@ to say losetogiraffe:
 	otherwise:
 		say "     Unable to continue to resist the giraffe's advances, you are pulled into a French kiss that dives her long, blue tongue down your throat";
 	say ".  You can't help but moan into this kiss as her agile tongue squirms inside you, sending shivers of delight through your body.  In a daze after the kiss, she pushes you down into a nearby room, onto a bed and leaps atop you.";
-	let raffesex be 0;
 	let mchance be 4;
 	if "Submissive" is listed in feats of player, increase mchance by 2;
 	if "More Anal" is listed in feats of player, increase mchance by 2;

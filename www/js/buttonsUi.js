@@ -127,6 +127,14 @@ function setButtonsCombat(){
     enableButton(document.getElementById("b4"), "flee", function(){combatTurn("flee")});
 }
 
+function setButtonsConsent(onTrue, onFalse){
+    disableAllButtons();
+
+    enableButton(document.getElementById("b1"), "yes", onTrue);
+
+    enableButton(document.getElementById("b2"), "no", onFalse);
+}
+
 function setButtonsSingle(name, action){
     disableAllButtons();
     enableButton(document.getElementById("b1"), name, action);
@@ -134,6 +142,7 @@ function setButtonsSingle(name, action){
         
 function setButtonsTravel(){
     var curLoc=data[data.currentLocation.value];
+    addToDisplay(curLoc.name);
     disableAllButtons();
     var b1=document.getElementById("b1");
     if('northwest' in curLoc){
@@ -150,7 +159,7 @@ function setButtonsTravel(){
 
     enableButton(document.getElementById("b4"), "speak", sayHello);
 
-    enableButton(document.getElementById("b5"), "smut", displaySmut);
+    enableButton(document.getElementById("b5"), "debug 2", debugTest2);
 
     var b6=document.getElementById("b6");
     if('west' in curLoc){
@@ -166,7 +175,7 @@ function setButtonsTravel(){
 
     enableButton(document.getElementById("b9"), "clear", clearDisplay);
 
-    enableButton(document.getElementById("b10"), "debug", debugTest);
+    enableButton(document.getElementById("b10"), "debug 1", debugTest1);
 
     var b11=document.getElementById("b11");
     if('southwest' in curLoc){

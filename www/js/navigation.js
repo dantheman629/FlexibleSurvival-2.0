@@ -27,46 +27,45 @@ function describeCurrentLocation(){
 }
 
 function goNorth(){
-    nowIs(data[data.currentLocation.value].north, "known");
     setLocation(data[data.currentLocation.value].north);
 }
 
 function goSouth(){
-    nowIs(data[data.currentLocation.value].south, "known");
     setLocation(data[data.currentLocation.value].south);
 }
 function goEast(){
-    nowIs(data[data.currentLocation.value].north, "known");
+    addToDisplay("go east");
     setLocation(data[data.currentLocation.value].east);
 }
 
 function goWest(){
-    nowIs(data[data.currentLocation.value].north, "known");
     setLocation(data[data.currentLocation.value].west);
 }
 
 function goNorthEast(){
-    nowIs(data[data.currentLocation.value].north, "known");
     setLocation(data[data.currentLocation.value].northeast);
 }
 
 function goSouthEast(){
-    nowIs(data[data.currentLocation.value].north, "known");
+    addToDisplay("go south east");
     setLocation(data[data.currentLocation.value].southeast);
 }
 function goNorthWest(){
-    nowIs(data[data.currentLocation.value].north, "known");
     setLocation(data[data.currentLocation.value].northwest);
 }
 
 function goSouthWest(){
-    nowIs(data[data.currentLocation.value].north, "known");
     setLocation(data[data.currentLocation.value].southwest);
 }
 
 function setLocation(locName){
+    addToDisplay("test1");
     data.currentLocation.value=locName;
+    addToDisplay("test2");
+    nowIs(data.currentLocation.value, "known");
+    addToDisplay("test3");
     setButtonsTravel();
+    addToDisplay("test4");
     describeCurrentLocation();
 }
 
