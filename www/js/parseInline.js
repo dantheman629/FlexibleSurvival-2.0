@@ -40,6 +40,7 @@ function parseInput(input){
 }
 
 function getValue(input){
+    input=input.replace("the ", "");
     if(!isNaN(input)){
         return input;
     }
@@ -55,15 +56,14 @@ function getValue(input){
     var found=data;
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
-        if(found == 'undefined')
+        if(!found)
             error("ERROR: Unkown object "+input);
     }
-    if(found.value == 'undefined')
-        error("ERROR: Unkown value "+input);
     return found.value;
 }
 
 function findObject(input){
+    input=input.replace("the ", "");
     if(input in functions){
         return functions[input];
     }
@@ -72,7 +72,7 @@ function findObject(input){
     var found=data;
     for(i=lookups.length-1; i>=0; i--){
         found=found[lookups[i].trim()];
-        if(found == 'undefined')
+        if(!found)
             error("ERROR: Unkown object "+input);
     }
     return found;

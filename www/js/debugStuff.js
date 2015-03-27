@@ -10,9 +10,9 @@ data.testE1={type:"event", event:testEvent1, resolved:{type:"option", value:fals
 
 data.testE2={type:"event", event:testEvent2, resolved:{type:"option", value:false, others:["unresolved"]}, unresolved:{type:"option", value:true, others:["resolved"]}};
 
-data.latexFox={type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.")}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox")}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.")}, maxHp:50, attack:10};
+data.latexFox={type:"monster", name:"latex fox", description:function (){addToDisplay("There's a latex fox infront of you.  It's a fox that appears to be made of latex.");}, submitScene:function (){addToDisplay("You submit and get fucked by a latex fox");}, defeatScene:function (){addToDisplay("You are beat up by a latex fox and get fucked.");}, victoryScene:function (){addToDisplay("You beat up a latex fox and fuck it.");}, maxHp:50, attack:10};
 
-data.huskyBitch={type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.")}, submitScene:function (){addToDisplay("You submit and get fucked by a husky")}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.")}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.")}, maxHp:100, attack:5};
+data.huskyBitch={type:"monster", name:"husky bitch", description:function (){addToDisplay("There's a husky bitch infront of you.  She's also husky looking and all slutty and shit.");}, submitScene:function (){addToDisplay("You submit and get fucked by a husky");}, defeatScene:function (){addToDisplay("You are beat up by a husky and get fucked.");}, victoryScene:function (){addToDisplay("You beat up a husky and fuck it.");}, maxHp:100, attack:5};
 
 data.testBoolArray={type:"boolean list", value:[false, false, false]};
 savableData.push({name:"testBoolArray", type:"boolean list"});
@@ -69,7 +69,7 @@ var northwest={type:"location", name:'northwest', description:'whole lotta nothi
 var west={type:"location", name:'west', description:'whole lotta nothing but in the west', north:"northwest", south:"southwest", southeast:"south", east:"entrance", northeast:"north", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
 
 var southwest={type:"location", name:'southwest', description:'whole lotta nothing but in the southwest', north:"west", northeast:"entrance", east:"south", things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
-var mall={type:"location", name:'Smith Haven Mall', navable:true, description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', navable:true, things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
+var mall={type:"location", name:'Smith Haven Mall', description:'hey you\'re at the mall, congratulations.  Unfortunatley it looks like there\'s nothing here yet', navable:true, things:[], events:[], monsters:[], known:{type:"option", value:false, others:[]}};
 
 var doSomething={type:"action", name:"action", action:doFSAction};
 entrance.things.something=doSomething;
@@ -94,7 +94,7 @@ data.mall.monsters.push("huskyBitch");
 data.north.monsters.push("latexFox");
 data.north.monsters.push("huskyBitch");
 
-var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}}
+var aThing={type:"thing", name:"thing", description:"Its a thing alrgiht.", actions:[], data:{}};
 var fuck={type:"action", name:"fuck", action:function (){ addToDisplay("Wow you would fuck a thing?");}};
 aThing.actions.fuck=fuck;
 var talk={type:"action", name:"talk", action:function (){addToDisplay("Its a thing it doesn't talk.");}};
@@ -103,12 +103,16 @@ addThing("entrance", "thing", aThing);
 
 player.feats.value.push("Submissive");
 
-functions["mimpregchance"]={type:"function", value:function(onDone){onDone();}};
+functions.mimpregchance={type:"function", value:function(onDone){onDone();}};
 
 function debugTest1(){
     //functions["beatthegiraffe"].value(function(){addToDisplay("");addToDisplay("All done.");setButtonsTravel()});
-    var row=tables[currentTable].rows[0];
-    evaluateStatement(row.cock.value.inside,0, function (){addToDisplay("");addToDisplay("done");});
+    addToDisplay(data.situation.unresolved.value);
+    addToDisplay(data.situation.resolved.value);
+    addToDisplay(data["test situation"].unresolved.value);
+    addToDisplay(data["test situation"].resolved.value);
+    addToDisplay(data["other test situation"].unresolved.value);
+    addToDisplay(data["other test situation"].resolved.value);
 }
 
 function testfunc(onDone){
@@ -116,9 +120,9 @@ function testfunc(onDone){
     onDone();
 }
 
-functions["testfunc"]={type:"function", value:testfunc};
+functions.testfunc={type:"function", value:testfunc};
 
 function debugTest2(){
     addToDisplay("starting");
-    readFile("inform/Feral Sea Dragon.i7x");
+    readFile("inform/test.i7x");
 }

@@ -9,6 +9,33 @@ function getRandom(a,b){
     return r;
 }
 
+function clone(obj){
+    var newObj={};
+    var value;
+    var newValue;
+    for(var key in obj){
+        value=obj[key];
+        if(key == "type")
+            newObj.type=obj.type;
+        else if(value.type == "text"){
+            newValue={type:"text", inside:value.inside, original:value.original};
+            newObj[key]=newValue;
+        }
+        else if(value.type == "number"){
+            newValue={type:"number", value:obj[key].value};
+            newObj[key]=newValue;
+        }
+        else if(value.type == "option"){
+            newValue={type:"option", value:obj[key].value, others:obj[key].others};
+            newObj[key]=newValue;
+        }
+        else{
+            newObj[key]=clone(value);
+        }
+    }
+    return newObj;
+}
+
 function error(output){
     addToDisplay("");
     addToDisplay("-------------------");
@@ -35,7 +62,7 @@ function nowIs(name, value){
         obj[value].value=true;
         var others=obj[value].others;
         for(var key in others){
-            obj[others[key]]=false;
+            obj[others[key]].value=false;
         }
     }
 }

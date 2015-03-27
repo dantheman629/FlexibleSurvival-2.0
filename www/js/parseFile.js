@@ -60,6 +60,7 @@ function evaluateLines(lines, i, onDone){
         continuef();
     }
     else if(lines[i].type == "now is"){
+        addToDisplay("now is");
         if(!isNaN(lines[i].value)){
             nowIs(lines[i].name, lines[i].value);
         }
@@ -73,8 +74,8 @@ function evaluateLines(lines, i, onDone){
             nowIs(lines[i].name, lines[i].value == "true");
         }
         else{
-            var value=getValue(lines[i].value);
-            nowIs(lines[i].name, value);
+            addToDisplay(lines[i].value);
+            nowIs(lines[i].name, lines[i].value);
         }
         continuef();
     }
@@ -221,13 +222,16 @@ function getIncrease(line){
 }
 
 function evaluateIsA(lines, i){
-    if(lines.length <= i)
+    if(lines.length <= i){
         return;
-    if(/ is a /.test(lines[i])){
+    }
+    lines[i]=lines[i].replace(/^a |^an |^the /i,"");
+    lines[i]=lines[i].replace(/ a | an | the /gi," ");
+    if(/ is (?!usually)/.test(lines[i])){
         var line=lines[i].trim();
         var varies=/ that varies/.test(line);
         line=line.replace(" that varies", "");
-        line=line.split(" is a ");
+        line=line.split(" is ");
         var newVal={};
         if(line[1] == "number"){
             newVal.type="number";
@@ -237,6 +241,14 @@ function evaluateIsA(lines, i){
             newVal.type="option";
             newVal.value=false;
             newVal.others=[];
+        }
+        else if(line[1] == "text"){
+            newVal.type="text";
+            newVal.value=parseInput("");
+        }
+        else if(/kind of /.test(line[1])){
+            line[1]=line[1].replace("kind of ", "");
+            newVal=clone(findObject(line[1]));
         }
         data[line[0]]=newVal;
         if(varies)
@@ -252,6 +264,47 @@ function evaluateIsA(lines, i){
             obj.value=line[1].value == "true";
         else if(obj.type == "text")
             obj.value=parseInput(line[1].trim().replace(/^"/,"").replace(/"$/,""));
+        else{
+            addToDisplay("usually option");
+            nowIs(line[0], line[1]);
+        }
+    }
+    else if(/ has /.test(lines[i])){
+        var line=lines[i].trim();
+        line=line.split(/ has | called /);
+        var newVal={};
+        if(line[1] == "number"){
+            newVal.type="number";
+            newVal.value=0;
+        }
+        else if(line[1] == "truth state"){
+            newVal.type="option";
+            newVal.value=false;
+            newVal.others=[];
+        }
+        else if(line[1] == "text"){
+            newVal.type="text";
+            newVal.value=parseInput("");
+        }
+        data[line[0]][line[2]]=newVal;
+        savableData.push({name:line[2]+" of "+line[0], type:newVal.type});
+    }
+    else if(/ can be /.test(lines[i])){
+        var line=lines[i].trim();
+        line=line.split(/ can be | or /);
+        var newList;
+        var newVal;
+        for(var k=1; k<line.length; k++){
+            newList=[];
+            for(var j=1; j<line.length; j++){
+                if(j!=k){
+                    newList.push(line[j]);
+                }
+            }
+            data[line[0]][line[k]]={type:"option", value:false, others:newList};
+        savableData.push({name:line[k]+" of "+line[0], type:"option"});
+        }
+        data[line[0]][line[1]].value=true;
     }
     evaluateIsA(lines, i+1);
 }
@@ -301,10 +354,9 @@ function getLineObject(line){
         type="section";
     else if(/^add .* to .* of/.test(line))
         type="add";
-    else if(/^.* is a .* that varies/.test(line.toLowerCase()))
+    else if(/ is .*\.\s*/.test(line.toLowerCase()))
         return getIsA(line);
     else{
-        addToDisplay(line);
         type="other";
     }
     return {type:type, inside:[], value:line};

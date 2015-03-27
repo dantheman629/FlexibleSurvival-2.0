@@ -4,6 +4,7 @@ when play begins:
 
 nogiraffesex is a number that varies. nogiraffesex is usually 0.
 
+
 to say losetogiraffe:
 	now nogiraffesex is 0;
 	if hp of player > 0:
