@@ -88,109 +88,109 @@
     <style>
         #game {
             background-color: lightgrey;
-            width: 600px;
-            height: 800px;
-            padding: 10px;
-            border: 3px solid black;
-            margin: 25px;
+            width: 0px auto;
+            height: 0px auto;
+	    padding: 0.5em;
+            border: 0.2em solid black;
+            margin: 0.5em;
         }
         
         #info {
             background-color: white;
-            width:566px;
-            height:100px;
-            padding:10px;
-            margin:5px;
-            border: 3px solid black;
+            width:0px auto;
+            height:10em;
+            padding:0.8em;
+            margin:0.4em;
+            border: 0.2em solid black;
             align-content: center;
         }
         
         #health {
             background-color: white;
-            width:165px;
-            height:20px;
-            padding:0px;
-            margin:5px;
+            width:100%;
+            height:1em;
+            padding:0.1em;
+            margin:0em;
             align-content: center;
             float:left;
         }
         
         #turns {
             background-color: white;
-            width:175px;
-            height:20px;
-            padding:0px;
-            margin:5px;
+            width:100%;
+            height:1em;
+            padding:0.1em;
+            margin:0em;
             align-content: center;
             float:left;
         }
         
         #time {
             background-color: white;
-            width:165px;
-            height:20px;
-            padding:0px;
-            margin:5px;
+            width:100%;
+            height:1em;
+            padding:0.1em;
+            margin:0em;
             align-content: center;
             float:left;
         }
         
         #remaining {
             background-color: white;
-            width:165px;
-            height:20px;
-            padding:0px;
-            margin:5px;
+            width:100%;
+            height:1em;
+            padding:0.1em;
+            margin:0em;
             align-content: center;
             float:left;
         }
         
         #display {
             background-color: white;
-            width:566px;
-            height:450px;
-            padding:10px;
-            margin:5px;
-            border: 3px solid black;
+            width: 98.3%;
+            height:30em;
+            padding:0.5em;
+            margin:0.25em;
+            border: 0.2em solid black;
             align-content: center;
             overflow-y: scroll
         }
         
         #buttons {
             background-color: white;
-            width:566px;
-            height:150px;
-            padding:10px;
-            margin:5px;
-            border: 3px solid black;
+            width:0px auto;
+            height:10em;
+            padding:0.25em;
+            margin:0.25em;
+            border: 0.2em solid black;
             align-content: center;
         }
         
         #combatPlayer{
             background-color: white;
-            width:200px;
-            height:100px;
-            padding:0px;
-            margin:5px;
+            width:10em;
+            height:5em;
+            padding:0em;
+            margin:0.5em;
             align-content: center;
             float:left;
         }
         
         #combatEnemy{
             background-color: white;
-            width:200px;
-            height:100px;
-            padding:0px;
-            margin:5px;
+            width:10em;
+            height:5em;
+            padding:0em;
+            margin:0.5em;
             align-content: center;
             float:right;
         }
         
         button {
-            width: 100px;
-            height: 40px;
-            margin: 5px;
-            padding:0px;
+            width: 8em;
+            height: 3em;
+            margin: 0.1em;
+            padding:0em;
         }
         
         #title {
@@ -213,12 +213,14 @@
             <button id="b3" onclick="goNorthEast()" type="button" class="actor">northeast</button>
             <button id="b4" onclick="sayHello()" type="button" class="actor">speak</button>
             <button id="b5" onclick ="debugTest2()" type="button" class="actor">debug test2</button>
+	    <p></p>
             <button id="b6" onclick="goWest()" type="button" class="actor">west</button>
             <button id="b7" onclick="describeCurrentLocation()" type="button" class="actor">current</button>
             <button id="b8" onclick="goEast()" type="button" class="actor">east</button>
             <button id="b9" onclick="clearDisplay()" type="button" class="actor">clear</button>
             <button id="b10" onclick="debugTest1()" type="button" class="actor">debug test1</button>
-            <button id="b11" onclick="goSouthWest()" type="button" class="actor">southwest</button>
+	    <p></p>
+	    <button id="b11" onclick="goSouthWest()" type="button" class="actor">southwest</button>
             <button id="b12" onclick="goSouth()" type="button" class="actor">south</button>
             <button id="b13" onclick="goSouthEast()" type="button" class="actor">southeast</button>
             <button id="b14" onclick="navRaped()" type="button" class="actor">navigate</button>
