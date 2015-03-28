@@ -227,11 +227,14 @@ function evaluateIsA(lines, i){
     }
     lines[i]=lines[i].replace(/^a |^an |^the /i,"");
     lines[i]=lines[i].replace(/ the /gi," ");
+    addToDisplay("is a "+lines[i]);
     if(/ is a /.test(lines[i])){
+        addToDisplay(" is a ");
+        lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         var varies=/ that varies/.test(line);
         line=line.replace(" that varies", "");
-        line=line.split(/ is a | is an /);
+        line=line.split(/ is /);
         var newVal={};
         if(line[1] == "number"){
             newVal.type="number";
@@ -246,10 +249,11 @@ function evaluateIsA(lines, i){
             newVal.type="text";
             newVal.value=parseInput("");
         }
-        else if(/list of/.test(line[i])){
+        else if(/list of/.test(line[1])){
+            addToDisplay("define list");
             newVal.type="list";
             var type=line[i].replace("list of ", "");
-            type=line[i].replace(/s$/, "");
+            type=type.replace(/s$/, "");
             newVal.ltype=type;
             newVal.value=[];
         }
@@ -258,13 +262,17 @@ function evaluateIsA(lines, i){
             newVal=clone(findObject(line[1]));
         }
         data[line[0]]=newVal;
+        addToDisplay(line[0]);
         if(varies)
             savableData.push({name:line[0], type:newVal.type});
     }
     else if(/ is usually| is /.test(lines[i])){
+        addToDisplay(" is ");
+        lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ is usually | is (?!usually )/);
         var obj=findObject(line[0].trim());
+        addToDisplay(obj.type);
         if(obj.type == "number")
             obj.value=parseInt(line[1].trim());
         else if(obj.type == "option")
@@ -279,6 +287,8 @@ function evaluateIsA(lines, i){
         }
     }
     else if(/ has /.test(lines[i])){
+        addToDisplay(" has ");
+        lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ has | called /);
         var newVal={};
@@ -295,12 +305,23 @@ function evaluateIsA(lines, i){
             newVal.type="text";
             newVal.value=parseInput("");
         }
-        data[line[0]][line[2]]=newVal;
+        else if(/list of/.test(line[1])){
+            addToDisplay("define list");
+            newVal.type="list";
+            var type=line[1].replace("list of ", "");
+            type=type.replace(/s$/, "");
+            newVal.ltype=type;
+            newVal.value=[];
+        }
+        findObject(line[0])[line[2]]=newVal;
         savableData.push({name:line[2]+" of "+line[0], type:newVal.type});
     }
     else if(/ can be /.test(lines[i])){
+        addToDisplay(" can be ");
+        lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ can be | or /);
+        addToDisplay(data.situation);
         var newList;
         var newVal;
         for(var k=1; k<line.length; k++){

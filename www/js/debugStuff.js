@@ -108,10 +108,8 @@ player.feats.value.push("Submissive");
 functions.mimpregchance={type:"function", value:function(onDone){onDone();}};
 
 function debugTest1(){
-    addToDisplay("cloning");
-    data.testList2=clone(data.testList);
-    addToDisplay("cloned");
-    addToDisplay(data.testList2.list.value[2].value);
+    addToDisplay("starting");
+    addToDisplay(data.situation.feats.value[0].value.original);
 }
 
 function testfunc(onDone){
