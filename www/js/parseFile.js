@@ -60,7 +60,6 @@ function evaluateLines(lines, i, onDone){
         continuef();
     }
     else if(lines[i].type == "now is"){
-        addToDisplay("now is");
         if(!isNaN(lines[i].value)){
             nowIs(lines[i].name, lines[i].value);
         }
@@ -74,7 +73,6 @@ function evaluateLines(lines, i, onDone){
             nowIs(lines[i].name, lines[i].value == "true");
         }
         else{
-            addToDisplay(lines[i].value);
             nowIs(lines[i].name, lines[i].value);
         }
         continuef();
@@ -117,7 +115,7 @@ function evaluateLines(lines, i, onDone){
                 type.type="option";
                 type.others=[];
             }
-            newRow[key.replace("\r","")]=value;
+            newRow[key]=value;
         }
         tables[currentTable].rows.push(newRow);
         continuef();
@@ -160,7 +158,7 @@ function getToSay(line){
 }
     
 function getLetBe(line){
-    line=line.replace(/^\s*let *i/, "");
+    line=line.replace(/^\s*let */i, "");
     line=line.replace(/;.*/,"");
     var parts=line.split(" be ");
     var name=parts.shift();
@@ -227,9 +225,7 @@ function evaluateIsA(lines, i){
     }
     lines[i]=lines[i].replace(/^a |^an |^the /i,"");
     lines[i]=lines[i].replace(/ the /gi," ");
-    addToDisplay("is a "+lines[i]);
     if(/ is a /.test(lines[i])){
-        addToDisplay(" is a ");
         lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         var varies=/ that varies/.test(line);
@@ -250,7 +246,6 @@ function evaluateIsA(lines, i){
             newVal.value=parseInput("");
         }
         else if(/list of/.test(line[1])){
-            addToDisplay("define list");
             newVal.type="list";
             var type=line[i].replace("list of ", "");
             type=type.replace(/s$/, "");
@@ -262,17 +257,14 @@ function evaluateIsA(lines, i){
             newVal=clone(findObject(line[1]));
         }
         data[line[0]]=newVal;
-        addToDisplay(line[0]);
         if(varies)
             savableData.push({name:line[0], type:newVal.type});
     }
     else if(/ is usually| is /.test(lines[i])){
-        addToDisplay(" is ");
         lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ is usually | is (?!usually )/);
         var obj=findObject(line[0].trim());
-        addToDisplay(obj.type);
         if(obj.type == "number")
             obj.value=parseInt(line[1].trim());
         else if(obj.type == "option")
@@ -282,12 +274,10 @@ function evaluateIsA(lines, i){
         else if(obj.type == "list")
             obj.value=convertToList(line[1]);
         else{
-            addToDisplay("usually option");
             nowIs(line[0], line[1]);
         }
     }
     else if(/ has /.test(lines[i])){
-        addToDisplay(" has ");
         lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ has | called /);
@@ -306,22 +296,22 @@ function evaluateIsA(lines, i){
             newVal.value=parseInput("");
         }
         else if(/list of/.test(line[1])){
-            addToDisplay("define list");
             newVal.type="list";
             var type=line[1].replace("list of ", "");
             type=type.replace(/s$/, "");
             newVal.ltype=type;
             newVal.value=[];
         }
+        else{
+            newVal=clone(findObject(line[1]));
+        }
         findObject(line[0])[line[2]]=newVal;
         savableData.push({name:line[2]+" of "+line[0], type:newVal.type});
     }
     else if(/ can be /.test(lines[i])){
-        addToDisplay(" can be ");
         lines[i]=lines[i].replace(/ a | an | the /i," ");
         var line=lines[i].trim();
         line=line.split(/ can be | or /);
-        addToDisplay(data.situation);
         var newList;
         var newVal;
         for(var k=1; k<line.length; k++){
@@ -344,12 +334,13 @@ function getWhen(line){
 }
 
 function getChooseBlank(line){
-    line=line.replace("Choose a blank row from Table of ", "");
+    line=line.replace("choose a blank row from table of ", "");
     line=line.replace(/;.*$/, "");
     return {type:"choose blank", table:line};
 }
 
 function getLineObject(line){
+    line=line.toLowerCase();
     var type="empty";
     line=line.replace(/\r/g, "");
     if(/^\s*to say .*:/i.test(line.toLowerCase()))

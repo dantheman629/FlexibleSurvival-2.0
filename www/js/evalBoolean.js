@@ -98,8 +98,14 @@ function is(strings){
     var obj=findObject(strings[0]);
     if(strings[1] in definitions)
         return definitions[strings[1]](strings[0]);
+    var val1=getValue(strings[0]);
+    if(val1.original)
+        val1=val1.original;
+    var val2=getValue(strings[1]);
+    if(val2.original)
+        val2=val2.original;
     if(obj.type == "text" || obj.type == "number" || obj.type =="option"){
-        return getValue(strings[0]) == getValue(strings[1]);
+        return val1 == val2;
     }
     return obj[strings[1]].value == true;
 }
@@ -148,9 +154,15 @@ function parseParen(toParse){
 function listedIn(input){
     input[0]=input[0].trim();
     input[1]=input[1].trim();
-    input[0]=input[0].replace(/^"/,"");
-    input[0]=input[0].replace(/"$/,"");
-    return -1 != getValue(input[1]).indexOf(input[0]);
+    var val1=getValue(input[0]);
+    if(val1.original)
+        val1=val1.original;
+    var list=getValue(input[1]);
+    var found=false;
+    for(var key in list){
+        found=found || list[key].value==val1;
+    }
+    return found;
 }
 
 function randomChance(input){

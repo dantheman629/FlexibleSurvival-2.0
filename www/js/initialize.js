@@ -9,36 +9,71 @@ var waitingStates=[];
 
 var defaultText=parseInput("");
 
-        
-var player={maxHp:{type:"number", value:100}, hp:{type:"number", value:100}, cunts:{type:"number", value:0}, cocks:{type:"number", value:1}, attack:10, feats:{type:"list", value:[]}};
+var person={};
+
+
+person["hp".toLowerCase()]={type:"number", value:0};
+person["xp".toLowerCase()]={type:"number", value:0};
+person["level".toLowerCase()]={type:"number", value:0};
+person["dexterity".toLowerCase()]={type:"number", value:0};
+person["thirst".toLowerCase()]={type:"number", value:0};
+person["lust".toLowerCase()]={type:"number", value:0};
+person["libido".toLowerCase()]={type:"number", value:0};
+person["linkaction".toLowerCase()]={type:"text", value:defaultText};
+person["Weapon damage".toLowerCase()]={type:"number", value:4};
+person["conversation".toLowerCase()]={type:"list", ltype:"text", value:[]};
+data.person=person;
+
+var player=clone(person);
 
 player[""]={type:"text", value:defaultText};
 
 player[""]={type:"number", value:0};
 
-player["name"]={type:"text", value:defaultText};
-player["Energy"]={type:"number", value:0};
-player["MaxHP"]={type:"number", value:0};
-player["Strength"]={type:"number", value:0};
-player["Stamina"]={type:"number", value:0};
-player["Charisma"]={type:"number", value:0};
-player["Intelligence"]={type:"number", value:0};
-player["Perception"]={type:"number", value:0};
-player["Hunger"]={type:"number", value:0};
-player["Morale"]={type:"number", value:0};
-player["Humanity"]={type:"number", value:0};
-player["Hunger"]={type:"number", value:0};
-player["cocks"]={type:"number", value:0};
-player["testes"]={type:"number", value:0};
-player["breasts"]={type:"number", value:0};
-player["cunts"]={type:"number", value:0};
-player["Breast Size"]={type:"number", value:0};
-player["Cock length"]={type:"number", value:0};
-player["Cock Width"]={type:"number", value:0};
-player["Cunt length"]={type:"number", value:0};
-player["Cunt width"]={type:"number", value:0};
-player["armor"]={type:"number", value:0};
-player["capacity"]={type:"number", value:0};
+player["name".toLowerCase()]={type:"text", value:defaultText};
+player["Energy".toLowerCase()]={type:"number", value:0};
+player["maxHP".toLowerCase()]={type:"number", value:0};
+player["Strength".toLowerCase()]={type:"number", value:0};
+player["Stamina".toLowerCase()]={type:"number", value:0};
+player["Charisma".toLowerCase()]={type:"number", value:0};
+player["Intelligence".toLowerCase()]={type:"number", value:0};
+player["Perception".toLowerCase()]={type:"number", value:0};
+player["Hunger".toLowerCase()]={type:"number", value:0};
+player["Morale".toLowerCase()]={type:"number", value:0};
+player["Humanity".toLowerCase()]={type:"number", value:0};
+player["Hunger".toLowerCase()]={type:"number", value:0};
+player["cocks".toLowerCase()]={type:"number", value:1};
+player["testes".toLowerCase()]={type:"number", value:0};
+player["breasts".toLowerCase()]={type:"number", value:0};
+player["cunts".toLowerCase()]={type:"number", value:0};
+player["Breast Size".toLowerCase()]={type:"number", value:0};
+player["Cock length".toLowerCase()]={type:"number", value:0};
+player["Cock Width".toLowerCase()]={type:"number", value:0};
+player["Cunt length".toLowerCase()]={type:"number", value:0};
+player["Cunt width".toLowerCase()]={type:"number", value:0};
+player["armor".toLowerCase()]={type:"number", value:0};
+player["capacity".toLowerCase()]={type:"number", value:0};
+
+player["skin".toLowerCase()]={type:"text", value:parseInput("smooth")};
+player["cock".toLowerCase()]={type:"text", value:parseInput("[one of]normal[or]flesh-toned[or]uninfected[or]human[at random]")};
+player["face".toLowerCase()]={type:"text", value:parseInput("charmingly human")};
+player["tail".toLowerCase()]={type:"text", value:parseInput("")};
+player["body".toLowerCase()]={type:"text", value:parseInput("body")};
+player["bodyname".toLowerCase()]={type:"text", value:parseInput("human")};
+player["facename".toLowerCase()]={type:"text", value:parseInput("human")};
+player["cockname".toLowerCase()]={type:"text", value:parseInput("human")};
+player["skinname".toLowerCase()]={type:"text", value:parseInput("human")};
+player["Cock Size Desc".toLowerCase()]={type:"text", value:parseInput("")};
+player["Cunt Size Desc".toLowerCase()]={type:"text", value:parseInput("")};
+player["Breast Size Desc".toLowerCase()]={type:"text", value:parseInput("")};
+player["Short Breast Size Desc".toLowerCase()]={type:"text", value:parseInput("")};
+player["weapon".toLowerCase()]={type:"text", value:parseInput("[one of]your quick wit[or]your fists[or]a quick kick[or]your body[or]some impromptu wrestling[or]an unarmed strike[at random]")};
+player["weapon type".toLowerCase()]={type:"text", value:parseInput("Melee")};
+
+player["feats"]={type:"list", ltype:"text", value:[]};
+data.player=player;
+
+
 var definitions={};
 
 var tables={};
@@ -62,7 +97,6 @@ tables["random critters"].types["cunt width"]="number";
 tables["random critters"].types["body descriptor"]="number";
 tables["random critters"].types["non-infectious"]="number";
 
-data.player=player;
 
 function isSubmissive(name){
     return name == "submissive";

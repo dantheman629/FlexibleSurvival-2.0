@@ -109,7 +109,8 @@ functions.mimpregchance={type:"function", value:function(onDone){onDone();}};
 
 function debugTest1(){
     addToDisplay("starting");
-    addToDisplay(data.situation.feats.value[0].value.original);
+    addToDisplay(data.player.cocks.value);
+    functions["losetogiraffe"].value(function(){addToDisplay("");addToDisplay("done")});
 }
 
 function testfunc(onDone){
@@ -121,5 +122,5 @@ functions.testfunc={type:"function", value:testfunc};
 
 function debugTest2(){
     addToDisplay("starting");
-    readFile("inform/test.i7x");
+    readFile("inform/Giraffe for FS.i7x");
 }

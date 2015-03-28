@@ -46,7 +46,10 @@ function getValue(input){
     }
     if(/"/.test(input)){
         input=input.replace(/"/g, "");
-        return input;
+        return parseInput(input);
+    }
+    if(/\{/.test(input)){
+        return convertToList(input);
     }
     if(input in functions){
         return functions[input]();
