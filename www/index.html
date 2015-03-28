@@ -88,22 +88,29 @@
     
     <style>
         #game {
+				position:absolute;
+				top:0px;
+				bottom:0px;
+				left:0px;
+				right:0px;
             background-color: lightgrey;
-            width: 600px;
-            height: 800px;
             padding: 10px;
             border: 3px solid black;
-            margin: 25px;
+            margin: 25px 25px 25px 25px;
+				overflow:hidden;
         }
         
         #info {
+				position:absolute;
             background-color: white;
-            width:566px;
+            right:10px;
+				left:10px;
             height:100px;
             padding:10px;
             margin:5px;
             border: 3px solid black;
             align-content: center;
+				overflow:hidden;
         }
         
         #health {
@@ -147,24 +154,33 @@
         }
         
         #display {
+				position:absolute;
             background-color: white;
-            width:566px;
-            height:450px;
+            right:10px;
+				left:10px;
             padding:10px;
-            margin:5px;
+				margin:0px 5px 0px 5px;
+				/* game top padding + info margin top + info margin bottom + info border top + info border bottom + info padding top + info padding bottom + info height: 10px + 5px + 5px + 3px + 3px + 10px + 10px + 100px */
+				top:146px;
+				/* game bottom padding + button margin top + button margin bottom + button border top + button border bottom + button padding top + button padding bottom + button height: 10px + 5px + 5px + 3px + 3px + 10px + 10px + 150px */
+				bottom:196px;
             border: 3px solid black;
             align-content: center;
             overflow-y: scroll
         }
         
         #buttons {
+				position:absolute;
             background-color: white;
-            width:566px;
+            right:10px;
+				left:10px;
             height:150px;
             padding:10px;
+				bottom:10px;
             margin:5px;
             border: 3px solid black;
             align-content: center;
+				overflow:hidden;
         }
         
         #combatPlayer{
@@ -186,13 +202,18 @@
             align-content: center;
             float:right;
         }
-        
+		  
         button {
             width: 100px;
             height: 40px;
             margin: 5px;
             padding:0px;
+				float:left;
         }
+		  
+		  .newrow {
+			clear:both;
+		  }
         
         #title {
             text-align: center
@@ -214,16 +235,17 @@
             <button id="b3" onclick="goNorthEast()" type="button" class="actor">northeast</button>
             <button id="b4" onclick="sayHello()" type="button" class="actor">speak</button>
             <button id="b5" onclick ="debugTest2()" type="button" class="actor">debug test2</button>
-            <button id="b6" onclick="goWest()" type="button" class="actor">west</button>
+            <button id="b6" onclick="goWest()" type="button" class="actor newrow">west</button>
             <button id="b7" onclick="describeCurrentLocation()" type="button" class="actor">current</button>
             <button id="b8" onclick="goEast()" type="button" class="actor">east</button>
             <button id="b9" onclick="clearDisplay()" type="button" class="actor">clear</button>
             <button id="b10" onclick="debugTest1()" type="button" class="actor">debug test1</button>
-            <button id="b11" onclick="goSouthWest()" type="button" class="actor">southwest</button>
+            <button id="b11" onclick="goSouthWest()" type="button" class="actor newrow">southwest</button>
             <button id="b12" onclick="goSouth()" type="button" class="actor">south</button>
             <button id="b13" onclick="goSouthEast()" type="button" class="actor">southeast</button>
             <button id="b14" onclick="navRaped()" type="button" class="actor">navigate</button>
             <button id="b15" onclick="setButtonsActions()" type="button" class="actor">actions</button>
+				<div class="newrow"></div><!-- finalizer, not really needed in THIS layout, but... -->
         </div>
     </div>
 </body>
