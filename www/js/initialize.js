@@ -23,6 +23,7 @@ person["linkaction".toLowerCase()]={type:"text", value:defaultText};
 person["Weapon damage".toLowerCase()]={type:"number", value:4};
 person["conversation".toLowerCase()]={type:"list", ltype:"text", value:[]};
 data.person=person;
+data.monser={type:"number", value:0};
 
 var player=clone(person);
 
