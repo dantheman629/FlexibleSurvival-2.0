@@ -18,6 +18,8 @@ data.testBoolArray={type:"boolean list", value:[false, false, false]};
 savableData.push({name:"testBoolArray", type:"boolean list"});
 savableData.push({name:"testText", type:"text"});
 
+data.testList={type:"thing", list:{type:"list", ltype:"number", value:[{type:"number", value:0}, {type:"number", value:1}, {type:"number", value:2}]}};
+
 function testEvent1(){
     addToDisplay("While exploring something happened that invloved you getting raped");
 }
@@ -106,13 +108,10 @@ player.feats.value.push("Submissive");
 functions.mimpregchance={type:"function", value:function(onDone){onDone();}};
 
 function debugTest1(){
-    //functions["beatthegiraffe"].value(function(){addToDisplay("");addToDisplay("All done.");setButtonsTravel()});
-    addToDisplay(data.situation.unresolved.value);
-    addToDisplay(data.situation.resolved.value);
-    addToDisplay(data["test situation"].unresolved.value);
-    addToDisplay(data["test situation"].resolved.value);
-    addToDisplay(data["other test situation"].unresolved.value);
-    addToDisplay(data["other test situation"].resolved.value);
+    addToDisplay("cloning");
+    data.testList2=clone(data.testList);
+    addToDisplay("cloned");
+    addToDisplay(data.testList2.list.value[2].value);
 }
 
 function testfunc(onDone){

@@ -226,12 +226,12 @@ function evaluateIsA(lines, i){
         return;
     }
     lines[i]=lines[i].replace(/^a |^an |^the /i,"");
-    lines[i]=lines[i].replace(/ a | an | the /gi," ");
-    if(/ is (?!usually)/.test(lines[i])){
+    lines[i]=lines[i].replace(/ the /gi," ");
+    if(/ is a /.test(lines[i])){
         var line=lines[i].trim();
         var varies=/ that varies/.test(line);
         line=line.replace(" that varies", "");
-        line=line.split(" is ");
+        line=line.split(/ is a | is an /);
         var newVal={};
         if(line[1] == "number"){
             newVal.type="number";
@@ -246,6 +246,13 @@ function evaluateIsA(lines, i){
             newVal.type="text";
             newVal.value=parseInput("");
         }
+        else if(/list of/.test(line[i])){
+            newVal.type="list";
+            var type=line[i].replace("list of ", "");
+            type=line[i].replace(/s$/, "");
+            newVal.ltype=type;
+            newVal.value=[];
+        }
         else if(/kind of /.test(line[1])){
             line[1]=line[1].replace("kind of ", "");
             newVal=clone(findObject(line[1]));
@@ -254,9 +261,9 @@ function evaluateIsA(lines, i){
         if(varies)
             savableData.push({name:line[0], type:newVal.type});
     }
-    else if(/ is usually/.test(lines[i])){
+    else if(/ is usually| is /.test(lines[i])){
         var line=lines[i].trim();
-        line=line.split(" is usually ");
+        line=line.split(/ is usually | is (?!usually )/);
         var obj=findObject(line[0].trim());
         if(obj.type == "number")
             obj.value=parseInt(line[1].trim());
@@ -264,6 +271,8 @@ function evaluateIsA(lines, i){
             obj.value=line[1].value == "true";
         else if(obj.type == "text")
             obj.value=parseInput(line[1].trim().replace(/^"/,"").replace(/"$/,""));
+        else if(obj.type == "list")
+            obj.value=convertToList(line[1]);
         else{
             addToDisplay("usually option");
             nowIs(line[0], line[1]);

@@ -6,10 +6,39 @@ var savableData=[{name:"turn", type:"number"}, {name:"currentLocation", type:"te
 var otherwiseStates=[];
 
 var waitingStates=[];
+
+var defaultText=parseInput("");
+
         
 var player={maxHp:{type:"number", value:100}, hp:{type:"number", value:100}, cunts:{type:"number", value:0}, cocks:{type:"number", value:1}, attack:10, feats:{type:"list", value:[]}};
 
-player["cunt length"]={type:"number", value:30};
+player[""]={type:"text", value:defaultText};
+
+player[""]={type:"number", value:0};
+
+player["name"]={type:"text", value:defaultText};
+player["Energy"]={type:"number", value:0};
+player["MaxHP"]={type:"number", value:0};
+player["Strength"]={type:"number", value:0};
+player["Stamina"]={type:"number", value:0};
+player["Charisma"]={type:"number", value:0};
+player["Intelligence"]={type:"number", value:0};
+player["Perception"]={type:"number", value:0};
+player["Hunger"]={type:"number", value:0};
+player["Morale"]={type:"number", value:0};
+player["Humanity"]={type:"number", value:0};
+player["Hunger"]={type:"number", value:0};
+player["cocks"]={type:"number", value:0};
+player["testes"]={type:"number", value:0};
+player["breasts"]={type:"number", value:0};
+player["cunts"]={type:"number", value:0};
+player["Breast Size"]={type:"number", value:0};
+player["Cock length"]={type:"number", value:0};
+player["Cock Width"]={type:"number", value:0};
+player["Cunt length"]={type:"number", value:0};
+player["Cunt width"]={type:"number", value:0};
+player["armor"]={type:"number", value:0};
+player["capacity"]={type:"number", value:0};
 var definitions={};
 
 var tables={};

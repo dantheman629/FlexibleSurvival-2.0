@@ -9,7 +9,39 @@ function getRandom(a,b){
     return r;
 }
 
+function convertToList(input){
+    var newInput=input.replace(/ *\{ *| *\} */g, "");
+    var elements=newInput.split(/, */);
+    var list=[];
+    var element;
+    for(var i=0; i<elements.length; i++){
+        element=elements[i];
+        if(/"/.test(element)){
+            element=element.trim().replace(/"/g,"");
+            element=parseInput(element);
+            element={type:"text", value:element};
+        }
+        else if(!isNaN(element)){
+            element={type:"number", value:parseInt(element)};
+        }
+        else{
+            element=getValue(element);
+        }
+        list.push(element);
+    }
+    return list;
+}
+
 function clone(obj){
+    if(obj.type == "text"){
+        return {type:"text", value:obj.value};
+    }
+    else if(obj.type == "number"){
+        return {type:"number", value:obj.value};
+    }
+    else if(obj.type == "option"){
+        return {type:"option", value:obj.value, others:obj.others};
+    }
     var newObj={};
     var value;
     var newValue;
@@ -27,6 +59,13 @@ function clone(obj){
         }
         else if(value.type == "option"){
             newValue={type:"option", value:obj[key].value, others:obj[key].others};
+            newObj[key]=newValue;
+        }
+        else if(/list/.test(value.type)){
+            newValue={type:"list", ltype:value.ltype, value:[]};
+            for(var i=0; i<value.value.length; i++){
+                newValue.value.push(clone(value.value[i]));
+            }
             newObj[key]=newValue;
         }
         else{
